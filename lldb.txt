@@ -50,6 +50,12 @@ Print variable as array (i.e. if you want all buffer, not just until null byte):
    (char) [3] = '\0'
  }
 
+If that variable is an array defined as `char arr[10]` and you want to
+see it as 10 character array and not a string, you have to cast it to
+pointer explicitly, otherwise lldb will complain:
+
+  parray 10 (char*) arr
+
 Print something as hex:
   p/x
 
