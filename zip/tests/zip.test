@@ -1,0 +1,11 @@
+$ ../my-zip test.1 >test.1.z; ../my-unzip test.1.z >test.1.id; diff test.1 test.1.id
+>= 0
+
+$ ../my-zip test.2 >test.2.z; ../my-unzip test.2.z >test.2.id; diff test.2 test.2.id
+>= 0
+
+$ ../my-zip ../my-zip.c >my-zip.z; ../my-unzip my-zip.z >my-zip.id; diff ../my-zip.c my-zip.id
+>= 0
+
+$ ../my-zip test.1 test.2 > test.12.z; ../my-unzip test.12.z > test.12; ../my-unzip test.12.z > test.12.id; cat test.1 test.2 > test.12; diff test.12 test.12.id
+>= 0

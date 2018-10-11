@@ -1,4 +1,9 @@
 *.dSYM/
+*.z
+*.id
+
+# binary files
 cat/my-cat
 grep/my-grep
-
+zip/my-zip
+zip/my-unzip
