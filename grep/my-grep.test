@@ -1,0 +1,76 @@
+<
+abc
+def
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+$ ./my-grep a
+>
+abc
+>= 0
+
+# BUG: Here we don't have a newline at the end, so we get EOF
+# but it should still work.
+$ ./my-grep a 1a | wc -c | sed 's/ //g'
+>
+1
+
+$ ./my-grep a 1a-nl
+>
+a
+
+$ ./my-grep a 1a-nl | wc -c | sed 's/ //g'
+>
+2
+
+# BUG: Here we have quite a long line (10 000 characters) w/o newline
+# at the end
+
+$ ./my-grep a 10000a | wc -c | sed 's/ //g'
+>
+10000
+
+# And even longer (20k)
+$ ./my-grep a 20000a | wc -c | sed 's/ //g'
+>
+20000
+
+<
+abcdef
+xa
+adf
+z
+$ ./my-grep a
+>
+abcdef
+xa
+adf
+
+# Power of twos
+$ ./my-grep a test.1
+>
+a
+a
+aaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+
+# Not only 'a' as a pattern
+<
+dabc
+abd
+abcd
+$ ./my-grep abc
+>
+dabc
+abcd
+
+# BUG: we first fill the buffer with something matching a pattern and
+# then have a next shorter line without \n symbol. It reuses the
+# buffer in match function and matching characters from the old buffer
+# content are matched succesfully against the pattern!
+$ ./my-grep a test.2
+>
+aaaa
+
+$ ./my-grep a test.3 | wc
+>
+    1024    1024  525824

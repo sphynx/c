@@ -1,0 +1,5 @@
+target create my-grep
+b my-grep.c:48
+b my-grep.c:96
+b match
+process launch -- a 10000a

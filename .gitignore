@@ -1,0 +1,4 @@
+*.dSYM/
+cat/my-cat
+grep/my-grep
+
