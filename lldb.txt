@@ -1,0 +1,64 @@
+## Helpful docs
+
+https://lldb.llvm.org/lldb-gdb.html
+https://lldb.llvm.org/tutorial.html
+https://www.objc.io/issues/19-debugging/lldb-debugging/
+
+
+## Useful lldb commands
+
+Compile with -g for debug info:
+  gcc -g -o my-grep my-grep.c
+
+Set executable in lldb:
+  lldb ./my-grep
+
+Pass parameters to the command:
+  lldb -- ./my-grep a b.txt c.txt
+
+Pass input file to stdin, equivalent to ./my-grep a <test:
+  lldb -- ./my-grep a
+  (lldb) process launch -i test
+
+Breakpoints:
+  b main
+  b go
+  b my-grep.c:48
+  br list
+
+Current position in the source file (i.e. frame):
+  f  -- for 'frame'
+
+Navigation:
+  n -- next for 'step over', next line basically
+  c -- for continue
+  s -- for 'step in'
+
+Show all local vars and arguments:
+  fr v
+
+Print variable:
+  (lldb) p *buffer
+  (char *) $0 = 0x0000000100500000 "ac\n"
+
+Print variable as array (i.e. if you want all buffer, not just until null byte):
+ (lldb) parray 4 *buffer
+ (char *) $1 = 0x0000000100500000 "ac\n" {
+   (char) [0] = 'a'
+   (char) [1] = 'c'
+   (char) [2] = '\n'
+   (char) [3] = '\0'
+ }
+
+Print something as hex:
+  p/x
+
+Print something as binary:
+  p/t
+
+Backtrace (stacktrace):
+  bt
+
+Frame info (for all parameters):
+  frame info
+
