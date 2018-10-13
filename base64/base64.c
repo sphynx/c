@@ -12,37 +12,38 @@
 
 typedef unsigned char sextet;
 typedef unsigned char octet;
-typedef unsigned char uchar;
 
-long
-base64_encoded_length(long len) {
-    return (long) (ceil((double) len / 3.0) * 4.0);
+static size_t
+base64_encoded_length(size_t len) {
+    return (size_t) (4 * ceil(len / 3.0));
 }
 
-char
+static char
 encode_char(sextet sextet) {
     char res;
 
     assert(sextet < 64);
 
     if (sextet < 26) {
-        // 'A' .. 'Z'
+        // 0 .. 25 -> 'A' .. 'Z'
         res = 'A' + sextet;
     } else if (sextet < 52) {
-        // 'a' .. 'z'
+        // 26 .. 51 -> 'a' .. 'z'
         res = 'a' + (sextet - 26);
     } else if (sextet < 62) {
-        // '0' .. '9'
+        // 52 .. 61 -> '0' .. '9'
         res = '0' + (sextet - 52);
     } else if (sextet == 62) {
+        // 62 -> '+'
         res = '+';
     } else {
+        // 63 -> '/'
         res = '/';
     }
     return res;
 }
 
-void
+static void
 encode_1byte(octet byte1, char* encoded) {
     sextet sextets[2];
 
@@ -55,7 +56,7 @@ encode_1byte(octet byte1, char* encoded) {
     *encoded   = '=';
 }
 
-void
+static void
 encode_2bytes(octet byte1, octet byte2, char* encoded) {
     int i;
     sextet sextets[3];
@@ -70,7 +71,7 @@ encode_2bytes(octet byte1, octet byte2, char* encoded) {
     *encoded = '=';
 }
 
-void
+static void
 encode_3bytes(octet byte1, octet byte2, octet byte3, char* encoded) {
     int i;
     sextet sextets[4];
@@ -90,8 +91,8 @@ encode_3bytes(octet byte1, octet byte2, octet byte3, char* encoded) {
  * Encodes to BASE64 and returns number of bytes succesfully encoded.
  */
 long
-base64_encode(octet* from, long len, char* to) {
-    int i;
+base64_encode(octet* from, size_t len, char* to) {
+    unsigned long i;
     long padded_bytes;
     octet byte1, byte2, byte3;
 
@@ -120,10 +121,10 @@ int
 main(int argc, char* argv[]) {
     FILE* stream;
 
-    long num_bytes;
-    uchar* buffer;
+    size_t num_bytes;
+    octet* buffer;
 
-    long num_encoded_bytes;
+    size_t num_encoded_bytes;
     char* encoded_buffer;
 
     if (argc == 2) {
@@ -147,14 +148,33 @@ main(int argc, char* argv[]) {
             exit(1);
         }
 
-        buffer = (uchar*) malloc(num_bytes);
-        fread(buffer, 1, num_bytes, stream);
+        // allocate memory, encode and print the result
+        buffer = (octet*) malloc(num_bytes);
+        if (buffer == NULL) {
+            exit(1);
+        }
+
+        if (fread(buffer, 1, num_bytes, stream) != num_bytes) {
+            printf("fread failed\n");
+            exit(1);
+        }
 
         num_encoded_bytes = base64_encoded_length(num_bytes);
         encoded_buffer = (char*) malloc(num_encoded_bytes);
+        if (encoded_buffer == NULL) {
+            exit(1);
+        }
+
         base64_encode(buffer, num_bytes, encoded_buffer);
-        fwrite(encoded_buffer, 1, num_encoded_bytes, stdout);
+        if (fwrite(encoded_buffer, 1, num_encoded_bytes, stdout) != num_encoded_bytes) {
+            printf("fwrite failed\n");
+            exit(1);
+        }
         printf("\n");
+
+        free(buffer);
+        free(encoded_buffer);
+        fclose(stream);
     } else {
         printf("usage: base64 <file>\n");
         exit(1);
