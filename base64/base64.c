@@ -154,6 +154,7 @@ main(int argc, char* argv[]) {
         encoded_buffer = (char*) malloc(num_encoded_bytes);
         base64_encode(buffer, num_bytes, encoded_buffer);
         fwrite(encoded_buffer, 1, num_encoded_bytes, stdout);
+        printf("\n");
     } else {
         printf("usage: base64 <file>\n");
         exit(1);
