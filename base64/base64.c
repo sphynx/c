@@ -88,43 +88,58 @@ encode_3bytes(octet byte1, octet byte2, octet byte3, char* encoded) {
 
 
 /*
- * Encodes to BASE64 and returns number of bytes succesfully encoded.
+ * Encodes to BASE64, returns a pointer to a newly allocated
+ * zero-terminated string or NULL in case of error. Don't forget to
+ * free() that string later.
  */
-long
-base64_encode(octet* from, size_t len, char* to) {
+char*
+base64_encode(octet* from, size_t len) {
     unsigned long i;
     long padded_bytes;
     octet byte1, byte2, byte3;
 
-    // Now, we handle 3 bytes at a time, converting them into 4
-    // sextets.
+    size_t to_len;
+    char* to;
+    char* curr;
+
+    // First, determine size of required result buffer, then malloc
+    // it (with 1 extra byte for zero termination).
+    to_len = base64_encoded_length(len);
+    to = (char*) malloc(to_len + 1);
+    if (to == NULL) {
+        return NULL;
+    }
+
+    // Zero-terminate.
+    to[to_len] = '\0';
+
+    // Now we handle 3 bytes at a time, converting them into 4
+    // sextets
+    curr = to;
     for (i = 0; i < len / 3; i++) {
         byte1 = *from++;
         byte2 = *from++;
         byte3 = *from++;
-        encode_3bytes(byte1, byte2, byte3, to);
-        to += 4;
+        encode_3bytes(byte1, byte2, byte3, curr);
+        curr += 4;
     }
 
     // Convert leftover bytes (if any) using padding.
     padded_bytes = len - 3 * (len / 3);
     if (padded_bytes == 1) {
-        encode_1byte(*from, to);
+        encode_1byte(*from, curr);
     } else if (padded_bytes == 2) {
-        encode_2bytes(*from, *(from + 1), to);
+        encode_2bytes(*from, *(from + 1), curr);
     }
 
-    return len;
+    return to;
 }
 
 int
 main(int argc, char* argv[]) {
     FILE* stream;
-
     size_t num_bytes;
     octet* buffer;
-
-    size_t num_encoded_bytes;
     char* encoded_buffer;
 
     if (argc == 2) {
@@ -159,18 +174,11 @@ main(int argc, char* argv[]) {
             exit(1);
         }
 
-        num_encoded_bytes = base64_encoded_length(num_bytes);
-        encoded_buffer = (char*) malloc(num_encoded_bytes);
-        if (encoded_buffer == NULL) {
+        encoded_buffer = base64_encode(buffer, num_bytes);
+        if (puts(encoded_buffer) < 0) {
+            printf("puts failed\n");
             exit(1);
         }
-
-        base64_encode(buffer, num_bytes, encoded_buffer);
-        if (fwrite(encoded_buffer, 1, num_encoded_bytes, stdout) != num_encoded_bytes) {
-            printf("fwrite failed\n");
-            exit(1);
-        }
-        printf("\n");
 
         free(buffer);
         free(encoded_buffer);
