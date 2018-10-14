@@ -96,7 +96,6 @@ char*
 base64_encode(octet* from, size_t len) {
     unsigned long i;
     long padded_bytes;
-    octet byte1, byte2, byte3;
 
     size_t to_len;
     char* to;
@@ -110,17 +109,12 @@ base64_encode(octet* from, size_t len) {
         return NULL;
     }
 
-    // Zero-terminate.
-    to[to_len] = '\0';
-
     // Now we handle 3 bytes at a time, converting them into 4
-    // sextets
+    // sextets.
     curr = to;
     for (i = 0; i < len / 3; i++) {
-        byte1 = *from++;
-        byte2 = *from++;
-        byte3 = *from++;
-        encode_3bytes(byte1, byte2, byte3, curr);
+        encode_3bytes(*from, *(from + 1), *(from + 2), curr);
+        from += 3;
         curr += 4;
     }
 
@@ -131,6 +125,9 @@ base64_encode(octet* from, size_t len) {
     } else if (padded_bytes == 2) {
         encode_2bytes(*from, *(from + 1), curr);
     }
+
+    // Zero-terminate.
+    to[to_len] = '\0';
 
     return to;
 }
