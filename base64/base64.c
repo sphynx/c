@@ -1,17 +1,9 @@
-/*
- * Basic BASE64 encoder.
- * Implementation is based on https://en.wikipedia.org/wiki/Base64
- * Solution to http://cryptopals.com/sets/1/challenges/1
- * MIME version.
- */
-
-#include <assert.h>
-#include <math.h>
-#include <stdio.h>
 #include <stdlib.h>
+#include <stdio.h>
+
+#include "base64.h"
 
 typedef unsigned char sextet;
-typedef unsigned char octet;
 
 static size_t
 base64_encoded_length(size_t len) {
@@ -44,7 +36,7 @@ encode_char(sextet sextet) {
 }
 
 static void
-encode_1byte(octet byte1, char* encoded) {
+encode_1byte(uint8_t byte1, char* encoded) {
     sextet sextets[2];
 
     sextets[0] = byte1 >> 2;
@@ -57,7 +49,7 @@ encode_1byte(octet byte1, char* encoded) {
 }
 
 static void
-encode_2bytes(octet byte1, octet byte2, char* encoded) {
+encode_2bytes(uint8_t byte1, uint8_t byte2, char* encoded) {
     int i;
     sextet sextets[3];
 
@@ -72,7 +64,7 @@ encode_2bytes(octet byte1, octet byte2, char* encoded) {
 }
 
 static void
-encode_3bytes(octet byte1, octet byte2, octet byte3, char* encoded) {
+encode_3bytes(uint8_t byte1, uint8_t byte2, uint8_t byte3, char* encoded) {
     int i;
     sextet sextets[4];
 
@@ -93,7 +85,7 @@ encode_3bytes(octet byte1, octet byte2, octet byte3, char* encoded) {
  * free() that string later.
  */
 char*
-base64_encode(octet* from, size_t len) {
+base64_encode(uint8_t* from, size_t len) {
     unsigned long i;
     long padded_bytes;
 
@@ -130,60 +122,4 @@ base64_encode(octet* from, size_t len) {
     to[to_len] = '\0';
 
     return to;
-}
-
-int
-main(int argc, char* argv[]) {
-    FILE* stream;
-    size_t num_bytes;
-    octet* buffer;
-    char* encoded_buffer;
-
-    if (argc == 2) {
-        stream = fopen(argv[1], "rb");
-        if (stream == NULL) {
-            perror(argv[1]);
-            exit(1);
-        }
-
-        // seek to end to determine file size
-        if (fseek(stream, 0, SEEK_END) == -1) {
-            perror("fseek");
-            exit(1);
-        }
-
-        num_bytes = ftell(stream);
-
-        // rewind back to the beginning
-        if (fseek(stream, 0, SEEK_SET) == -1) {
-            perror("fseek");
-            exit(1);
-        }
-
-        // allocate memory, encode and print the result
-        buffer = (octet*) malloc(num_bytes);
-        if (buffer == NULL) {
-            exit(1);
-        }
-
-        if (fread(buffer, 1, num_bytes, stream) != num_bytes) {
-            printf("fread failed\n");
-            exit(1);
-        }
-
-        encoded_buffer = base64_encode(buffer, num_bytes);
-        if (puts(encoded_buffer) < 0) {
-            printf("puts failed\n");
-            exit(1);
-        }
-
-        free(buffer);
-        free(encoded_buffer);
-        fclose(stream);
-    } else {
-        printf("usage: base64 <file>\n");
-        exit(1);
-    }
-
-    return 0;
 }
