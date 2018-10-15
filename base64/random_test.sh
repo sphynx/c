@@ -7,8 +7,15 @@ do
     dd if=/dev/urandom of=${FILE} bs=${size} count=1 2>/dev/null
     base64 ${FILE} >result.baseline
     ./my-base64 ${FILE} >result.mine
-    if ! $(diff -q result.baseline result.mine); then
-        echo "Test failed, please check result.baseline, result.mine and ${FILE}"
+    if ! diff -q result.baseline result.mine; then
+        echo "[FAIL] Test failed"
+        echo "Expected (from result.baseline):"
+        cat result.baseline
+        echo "====="
+        echo "Actual (from result.mine):"
+        cat result.mine
+        echo "====="
+        echo "on input from ${FILE}"
         exit 1
     fi
 done
