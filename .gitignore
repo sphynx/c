@@ -1,6 +1,8 @@
 *.dSYM/
 *.z
 *.id
+*.o
+*.gch
 
 # binary files
 cat/my-cat
