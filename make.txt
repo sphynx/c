@@ -1,0 +1,60 @@
+## Make notes
+
+To generate dependencies for Make we can use -M family of options of
+gcc/clang:
+
+  >  gcc -MM hex2base64.c
+  hex2base64.o: hex2base64.c hex.h base64.h
+
+  More details here:
+  https://clang.llvm.org/docs/ClangCommandLineReference.html#dependency-file-generation
+
+  Even better: gcc -MM *.c >>Makefile
+
+
+Make use of implicit rules, "Make" already knows how to compile obj
+files from .c!
+
+
+Automatic variables of Make are extremely useful:
+
+    $@ for target
+    $< for the first dependency
+    $^ for all dependencies w/o duplicates.
+
+  Example:
+
+    count_words: count_words.o counter.o lexer.o
+       gcc $^ -o $@
+
+
+Prepending command with @ does not print it while Makefile is running:
+
+  Example (does not print 'echo test' command, just prints 'test'):
+
+    @echo test
+
+
+VPATH (and `vpath`) can be used to add source directories.
+
+
+`CPPFLAGS = -I include` can be used to add directories with header
+files.
+
+
+Pattern rules look like this:
+
+  %.o: %.c
+    $(COMPILE.c) $(OUTPUT_OPTION) $<
+
+  %: %.o  # no suffix is also fine
+
+  They are more powerful and modern than old .SUFFIXES: approach and
+  ".c.o:" rules.
+
+
+Use `make -n` for dry-runs, when Make only prints what it's going to
+do.
+
+
+Use `make -p` to print its database of implicit rules and variables.
