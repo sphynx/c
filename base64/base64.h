@@ -1,8 +1,7 @@
 #pragma once
 
-#include <math.h>
-#include <assert.h>
 #include <inttypes.h>
+#include <stdio.h>
 
 /*
  * Encodes to BASE64, returns a pointer to a newly allocated
