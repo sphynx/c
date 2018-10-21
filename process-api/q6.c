@@ -4,16 +4,9 @@
 #include <sys/wait.h>
 
 /*
- * We can use `make run | grep -n child` with the parent printing many
- * messages to observe that the parent does not wait for the child (we
- * will see different results):
-
- * ➜  process-api git:(master) ✗ make run | grep child -n
- * 2342:parechild
- * ➜  process-api git:(master) ✗ make run | grep child -n
- * 2:child
-
- * So we can use `wait()` and fix that.
+ * Here we use `waitpid()` instead of `wait()`. It might be useful
+ * when we have several children and want to wait for a particular
+ * one.
  */
 
 int main(void) {
@@ -25,21 +18,12 @@ int main(void) {
         exit(1);
     } else if (rc == 0) {
         printf("child (pid:%d)\n", (int) getpid());
-
-        // Let's try to wait in the child, when we haven't forked
-        // anything... Then we expect to fail with ECHILD: no child
-        // processes and this is what actually happens.
-        int pid = wait(NULL);
-        if (pid == -1) {
-            perror("wait in child");
-        }
-
     } else {
         int status;
-        int wpid = wait(&status);
+        int wpid = waitpid(rc, &status, 0);
 
         if (wpid == -1) {
-            perror("wait");
+            perror("waitpid");
             exit(1);
         }
 
