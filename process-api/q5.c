@@ -25,6 +25,16 @@ int main(void) {
         exit(1);
     } else if (rc == 0) {
         printf("child (pid:%d)\n", (int) getpid());
+
+        // Let's try to wait in the child, when we haven't forked
+        // anything... Then we expect to fail with ECHILD: no child
+        // processes and this is what actually happens.
+        int pid = wait(NULL);
+        if (pid == -1) {
+            perror("wait in child");
+            exit(1);
+        }
+
     } else {
         int status;
         int wpid = wait(&status);
