@@ -3,13 +3,14 @@
 To generate dependencies for Make we can use -M family of options of
 gcc/clang:
 
-  >  gcc -MM hex2base64.c
+  >  gcc -MM *.c
   hex2base64.o: hex2base64.c hex.h base64.h
+  my-base64.o: my-base64.c base64.h
+  ...
 
   More details here:
   https://clang.llvm.org/docs/ClangCommandLineReference.html#dependency-file-generation
-
-  Even better: gcc -MM *.c >>Makefile
+  http://make.mad-scientist.net/papers/advanced-auto-dependency-generation/
 
 
 Make use of implicit rules, "Make" already knows how to compile obj
@@ -28,6 +29,17 @@ Automatic variables of Make are extremely useful:
        gcc $^ -o $@
 
 
+Pattern rules look like this:
+
+  %.o: %.c
+    $(COMPILE.c) $(OUTPUT_OPTION) $<
+
+  %: %.o  # no suffix is also fine
+
+  They are more powerful and modern than old .SUFFIXES: approach and
+  ".c.o:" rules.
+
+
 Prepending command with @ does not print it while Makefile is running:
 
   Example (does not print 'echo test' command, just prints 'test'):
@@ -42,19 +54,22 @@ VPATH (and `vpath`) can be used to add source directories.
 files.
 
 
-Pattern rules look like this:
-
-  %.o: %.c
-    $(COMPILE.c) $(OUTPUT_OPTION) $<
-
-  %: %.o  # no suffix is also fine
-
-  They are more powerful and modern than old .SUFFIXES: approach and
-  ".c.o:" rules.
-
-
 Use `make -n` for dry-runs, when Make only prints what it's going to
 do.
 
 
 Use `make -p` to print its database of implicit rules and variables.
+
+
+Minimal nice Makefile for many one-file executables (like exercises in
+the book), no header files:
+
+  CFLAGS = -g -Wall -Wextra -Werror -pedantic -std=c99
+
+  binaries = p1 p2
+
+  all: $(binaries)
+
+  .PHONY: clean
+  clean:
+     rm -r -f *.o $(binaries) *.dSYM
