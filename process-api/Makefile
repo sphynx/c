@@ -1,6 +1,6 @@
 CFLAGS = -g -Wall -Wextra -Werror -pedantic -std=c99
 
-binaries = p1 p2 q1 q2 q3 q4
+binaries = p1 p2 q1 q2 q3 q4 q5
 target = $(lastword $(binaries))
 
 all: $(binaries)
