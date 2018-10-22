@@ -11,4 +11,5 @@ zip/my-zip
 zip/my-unzip
 base64/my-base64
 base64/hex2base64
+base64/xor
 

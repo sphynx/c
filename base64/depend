@@ -2,4 +2,4 @@ base64.o: base64.c base64.h
 hex.o: hex.c hex.h
 hex2base64.o: hex2base64.c hex.h base64.h
 my-base64.o: my-base64.c base64.h
-xor.o: xor.c hex.h
+xor.o: xor.c hex.h xor.h
