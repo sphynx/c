@@ -9,7 +9,7 @@ cat/my-cat
 grep/my-grep
 zip/my-zip
 zip/my-unzip
-base64/my-base64
-base64/hex2base64
-base64/xor
+crypto-challenge/my-base64
+crypto-challenge/hex2base64
+crypto-challenge/xor
 
