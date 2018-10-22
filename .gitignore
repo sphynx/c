@@ -11,5 +11,6 @@ zip/my-zip
 zip/my-unzip
 crypto-challenge/my-base64
 crypto-challenge/hex2base64
-crypto-challenge/xor
+crypto-challenge/xor-test
+crypto-challenge/xor-cypher
 

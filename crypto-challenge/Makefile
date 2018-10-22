@@ -1,12 +1,13 @@
 CFLAGS = -g -Wall -Wextra -Werror -pedantic -std=c99
 
-binaries = my-base64 hex2base64 xor
+binaries = my-base64 hex2base64 xor-test xor-cypher
 
-all: test
+all: $(binaries)
 
 my-base64: base64.o my-base64.o
 hex2base64:	hex.o base64.o hex2base64.o
-xor: xor.o hex.o
+xor-test: xor.o hex.o
+xor-cypher: xor-cypher.o hex.o xor.o
 
 include depend
 
@@ -18,7 +19,10 @@ clean:
 test: $(binaries)
 	@shelltest test --color -p --execdir
 	@test/random_test.sh
-	@./xor
+	@./xor-test
 
 depend: *.c
 	$(CC) -MM $(CPPFLAGS) $^ > $@
+
+run: xor-cypher
+	./xor-cypher
