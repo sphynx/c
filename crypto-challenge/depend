@@ -1,7 +1,8 @@
 base64.o: base64.c base64.h
+freq.o: freq.c freq.h
 hex.o: hex.c hex.h
 hex2base64.o: hex2base64.c hex.h base64.h
 my-base64.o: my-base64.c base64.h
-xor-cypher.o: xor-cypher.c xor.h hex.h
+xor-cypher.o: xor-cypher.c freq.h hex.h xor.h
 xor-test.o: xor-test.c xor.h
 xor.o: xor.c hex.h xor.h

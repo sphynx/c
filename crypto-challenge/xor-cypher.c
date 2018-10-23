@@ -3,80 +3,15 @@
  * http://cryptopals.com/sets/1/challenges/3
  */
 
-#include <assert.h>
 #include <inttypes.h>
 #include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include "xor.h"
+#include "freq.h"
 #include "hex.h"
-
-#define ALPHABET_SIZE 26
-
-// Taken from https://en.wikipedia.org/wiki/Letter_frequency
-#define FREQ_ORDER "etaoinshrdlcumwfgypbvkjxqz"
-
-struct freq {
-    char c;
-    int freq;
-};
-
-static int
-compare_by_freq(const void* x, const void* y) {
-    const struct freq* sx = x;
-    const struct freq* sy = y;
-    return sy->freq - sx->freq; // descending order
-}
-
-static int
-char_canonical_order(char c) {
-    assert(c >= 'a' && c <= 'z');
-    char canonical_order[] = FREQ_ORDER;
-    char* cp = strchr(canonical_order, c);
-    return cp - canonical_order;
-}
-
-int
-score1(char* str, int n) {
-
-    assert(str != NULL);
-    assert(n >= 1 && n <= ALPHABET_SIZE);
-
-    // Idea of this scoring is the following. We count occurences of
-    // all letters and sort them based on frequencies, producing a
-    // permutation of 26 English letters. Then we add up the distances
-    // between positions of the top `n` (say n=10) letters of our
-    // orders with the canonical order. The lower score is the better.
-
-    struct freq freqs[ALPHABET_SIZE];
-    for (int i = 0; i < ALPHABET_SIZE; i++) {
-        struct freq f;
-        f.c = 'a' + i;
-        f.freq = 0;
-        freqs[i] = f;
-    }
-
-    char c;
-    while ((c = *str) != '\0') {
-        if (c >= 'a' && c <= 'z') {
-            freqs[c - 'a'].freq++;
-        } else if (c >= 'A' && c <= 'Z') {
-            freqs[c - 'A'].freq++;
-        }
-        str++;
-    }
-
-    qsort(freqs, ALPHABET_SIZE, sizeof(struct freq), compare_by_freq);
-
-    int score = 0;
-    for (int i = 0; i < n; i++) {
-        score += abs(char_canonical_order(freqs[i].c) - i);
-    }
-
-    return score;
-}
+#include "xor.h"
 
 int
 main(void) {
@@ -110,9 +45,9 @@ main(void) {
         xored_str[bytes_len] = '\0';
 
         // Score the string and check if we improved.
-        int score = score1(xored_str, 10);
-        if (score < min_score) {
-            min_score = score;
+        int curr_score = score(xored_str, 10);
+        if (curr_score < min_score) {
+            min_score = curr_score;
             cypher = c;
             best_string = strdup(xored_str);
             printf("Best string so far (score = %4d): %s\n",

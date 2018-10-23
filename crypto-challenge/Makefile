@@ -7,7 +7,7 @@ all: $(binaries)
 my-base64: base64.o my-base64.o
 hex2base64:	hex.o base64.o hex2base64.o
 xor-test: xor.o hex.o
-xor-cypher: xor-cypher.o hex.o xor.o
+xor-cypher: xor-cypher.o hex.o xor.o freq.o
 
 include depend
 
