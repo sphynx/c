@@ -18,3 +18,10 @@ struct freq {
  */
 int score(char* str, int n);
 
+
+/*
+ * Returns a best scrore for the string and makes res_str to point to
+ * the best string. It's malloc-ed, so you have to free it.
+ */
+
+int best_score(char* hex_str, char** res_str);

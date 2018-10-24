@@ -1,6 +1,6 @@
 CFLAGS = -g -Wall -Wextra -Werror -pedantic -std=c99
 
-binaries = my-base64 hex2base64 xor-test xor-cypher
+binaries = my-base64 hex2base64 xor-test xor-cypher challenge4
 
 all: $(binaries)
 
@@ -8,6 +8,7 @@ my-base64: base64.o my-base64.o
 hex2base64:	hex.o base64.o hex2base64.o
 xor-test: xor.o hex.o
 xor-cypher: xor-cypher.o hex.o xor.o freq.o
+challenge4: challenge4.o hex.o xor.o freq.o
 
 include depend
 
@@ -24,5 +25,5 @@ test: $(binaries)
 depend: *.c
 	$(CC) -MM $(CPPFLAGS) $^ > $@
 
-run: xor-cypher
-	./xor-cypher
+run: challenge4
+	./challenge4
