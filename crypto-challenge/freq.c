@@ -31,7 +31,7 @@ char_canonical_order(char c) {
  * for scoring (you can consider it an abstraction leak), see below.
  */
 int
-score(char* str, int n) {
+score(uint8_t* str, size_t len, int n) {
 
     /*
      * This particular scoring function is based on frequency of
@@ -53,14 +53,13 @@ score(char* str, int n) {
         freqs[i] = f;
     }
 
-    char c;
-    while ((c = *str) != '\0') {
+    for (unsigned int i = 0; i < len; i++) {
+        char c = str[i];
         if (c >= 'a' && c <= 'z') {
             freqs[c - 'a'].freq++;
         } else if (c >= 'A' && c <= 'Z') {
             freqs[c - 'A'].freq++;
         }
-        str++;
     }
 
     qsort(freqs, ALPHABET_SIZE, sizeof(struct freq), compare_by_freq);
@@ -73,49 +72,45 @@ score(char* str, int n) {
     return score;
 }
 
-int best_score(char* hex_str, char** res_str) {
+int
+best_score_hex(char* hex_str, char** res_str) {
     size_t hex_len = strlen(hex_str);
     size_t bytes_len = hex_len / 2;
-
     uint8_t* bytes = read_hex(hex_str, hex_len);
-    uint8_t* xor_mask = malloc(bytes_len);
+    return best_score_raw(bytes, bytes_len, res_str);
+}
 
+int
+best_score_raw(uint8_t* bytes, size_t bytes_len, char** res_str) {
     int min_score = INT_MAX;
-    char* best_string;
+    uint8_t* best_string;
     uint8_t cypher;
 
-    uint8_t c = 0;
+    uint8_t key = 0;
     for (;;) {
-        // Prepare mask as a buffer filled with occurences of a single
-        // character.
-        memset(xor_mask, c, bytes_len);
-
-        // Xor them.
-        uint8_t* xored = xor(bytes, xor_mask, bytes_len);
-
-        // FIXME: we can probably do it more efficiently (`realloc`?).
-        // Convert xored buffer to a string (by copying and appending
-        // zero byte).
-        char* xored_str = malloc(bytes_len + 1);
-        memcpy(xored_str, xored, bytes_len);
-        xored_str[bytes_len] = '\0';
-        free(xored);
+        // Xor them with the key.
+        uint8_t* xored = xor_with_byte(bytes, key, bytes_len);
 
         // Score the string and check if we improved.
-        int curr_score = score(xored_str, 10);
+        int curr_score = score(xored, bytes_len, 10);
         if (curr_score < min_score) {
             min_score = curr_score;
-            cypher = c;
-            best_string = xored_str;
+            cypher = key;
+            best_string = xored;
             //printf("Best string so far (score = %4d): %s\n", min_score, best_string);
         } else {
-            free(xored_str);
+            free(xored);
         }
 
-        c++;
-        if (c == 0) break;
+        key++;
+        if (key == 0) break; // full circle: we got to 0 again
     }
 
-    *res_str = best_string;
+    char* best_str_terminated = malloc(bytes_len + 1);
+    memcpy(best_str_terminated, best_string, bytes_len);
+    best_str_terminated[bytes_len] = '\0';
+    free(best_string);
+
+    *res_str = best_str_terminated;
     return min_score;
 }

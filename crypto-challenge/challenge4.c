@@ -18,7 +18,7 @@ int main(void) {
     while (getline(&line, &capacity, f) != -1) {
         *strrchr(line, '\n') = '\0';
 
-        int curr_score = best_score(line, &curr_best_line);
+        int curr_score = best_score_hex(line, &curr_best_line);
         if (curr_score < best_so_far) {
             best_so_far = curr_score;
             overall_best_line = strdup(curr_best_line);
