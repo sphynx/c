@@ -100,7 +100,7 @@ best_score_raw(uint8_t* bytes, size_t bytes_len, char** res_str) {
     uint8_t key = 0;
     for (;;) {
         // Xor them with the key.
-        uint8_t* xored = xor_with_byte(bytes, key, bytes_len);
+        uint8_t* xored = xor_with_byte_key(bytes, key, bytes_len);
 
         // Score the string and check if we improved.
         int curr_score = score(xored, bytes_len, 20);

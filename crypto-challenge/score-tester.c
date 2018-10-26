@@ -19,7 +19,7 @@ int main(void) {
 
     while ((len = getline(&line, &capacity, stdin)) > 0) {
         if (len < 15) continue; // skip short lines
-        xored = xor_with_byte((uint8_t*) line, KEY, len);
+        xored = xor_with_byte_key((uint8_t*) line, KEY, len);
         best_score_raw(xored, len, &decoded);
         if (strcmp(decoded, line) == 0) {
             ok++;
