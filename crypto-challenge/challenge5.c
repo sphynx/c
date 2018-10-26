@@ -3,9 +3,6 @@
 #include "xor.h"
 #include "hex.h"
 
-/*
- * Test driver for xor.c. Solves challenge #2.
- */
 int
 main(void) {
     uint8_t str[] =
