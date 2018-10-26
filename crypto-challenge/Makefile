@@ -6,11 +6,11 @@ target = $(lastword $(binaries))
 all: $(binaries)
 
 my-base64: base64.o my-base64.o
-score-tester: score-tester.o hex.o xor.o freq.o
+score-tester: score-tester.o hex.o xor.o score.o
 challenge1: challenge1.o base64.o hex.o
 challenge2: challenge2.o xor.o hex.o
-challenge3: challenge3.o xor.o hex.o freq.o
-challenge4: challenge4.o hex.o xor.o freq.o
+challenge3: challenge3.o xor.o hex.o score.o
+challenge4: challenge4.o hex.o xor.o score.o
 
 include depend
 
@@ -25,6 +25,7 @@ test: $(binaries)
 	@./challenge1
 	@./challenge2
 	@./challenge3
+	@./challenge4
 
 depend: *.c
 	$(CC) -MM $(CPPFLAGS) $^ > $@

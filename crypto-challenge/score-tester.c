@@ -1,6 +1,6 @@
 #include <string.h>
 
-#include "freq.h"
+#include "score.h"
 #include "xor.h"
 
 #define KEY 'X'

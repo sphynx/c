@@ -5,7 +5,7 @@
 
 #include <string.h>
 
-#include "freq.h"
+#include "score.h"
 #include "hex.h"
 #include "xor.h"
 

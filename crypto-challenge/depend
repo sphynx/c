@@ -1,10 +1,10 @@
 base64.o: base64.c base64.h
 challenge1.o: challenge1.c base64.h hex.h
 challenge2.o: challenge2.c xor.h
-challenge3.o: challenge3.c freq.h hex.h xor.h
-challenge4.o: challenge4.c freq.h
-freq.o: freq.c freq.h hex.h xor.h
+challenge3.o: challenge3.c score.h hex.h xor.h
+challenge4.o: challenge4.c score.h
 hex.o: hex.c hex.h
 my-base64.o: my-base64.c base64.h
-score-tester.o: score-tester.c freq.h xor.h
+score-tester.o: score-tester.c score.h xor.h
+score.o: score.c score.h hex.h xor.h
 xor.o: xor.c hex.h xor.h

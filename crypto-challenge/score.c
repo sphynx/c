@@ -1,11 +1,12 @@
 #include <assert.h>
+#include <ctype.h>
 #include <inttypes.h>
 #include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include "freq.h"
+#include "score.h"
 #include "hex.h"
 #include "xor.h"
 
@@ -18,7 +19,7 @@ compare_by_freq(const void* x, const void* y) {
 
 static int
 char_canonical_order(char c) {
-    assert(c >= 'a' && c <= 'z');
+    assert((c >= 'a' && c <= 'z') || c == ' ');
     char canonical_order[] = FREQ_ORDER;
     char* cp = strchr(canonical_order, c);
     return cp - canonical_order;
@@ -30,7 +31,7 @@ char_canonical_order(char c) {
  * better. The second argument is related to this particular algorithm
  * for scoring (you can consider it an abstraction leak), see below.
  */
-int
+static int
 score(uint8_t* str, size_t len, int n) {
 
     /*
@@ -43,15 +44,22 @@ score(uint8_t* str, size_t len, int n) {
      */
 
     assert(str != NULL);
-    assert(n >= 1 && n <= ALPHABET_SIZE);
+    assert(n >= 1 && n <= ALPHABET_SIZE + 1);
 
     struct freq freqs[ALPHABET_SIZE];
-    for (int i = 0; i < ALPHABET_SIZE; i++) {
+    for (int i = 0; i < ALPHABET_SIZE + 1; i++) {
         struct freq f;
-        f.c = 'a' + i;
+
+        if (i == ALPHABET_SIZE) {
+            f.c = ' ';
+        } else {
+            f.c = 'a' + i;
+        }
         f.freq = 0;
         freqs[i] = f;
     }
+
+    int score = 0;
 
     for (unsigned int i = 0; i < len; i++) {
         char c = str[i];
@@ -59,12 +67,15 @@ score(uint8_t* str, size_t len, int n) {
             freqs[c - 'a'].freq++;
         } else if (c >= 'A' && c <= 'Z') {
             freqs[c - 'A'].freq++;
+        } else if (c == ' ') {
+            freqs[ALPHABET_SIZE].freq++;
+        } else if (!ispunct(c)) {
+            score += n; // penalty for non-punctuation chars
         }
     }
 
-    qsort(freqs, ALPHABET_SIZE, sizeof(struct freq), compare_by_freq);
+    qsort(freqs, ALPHABET_SIZE + 1, sizeof(struct freq), compare_by_freq);
 
-    int score = 0;
     for (int i = 0; i < n; i++) {
         score += abs(char_canonical_order(freqs[i].c) - i);
     }
@@ -92,12 +103,11 @@ best_score_raw(uint8_t* bytes, size_t bytes_len, char** res_str) {
         uint8_t* xored = xor_with_byte(bytes, key, bytes_len);
 
         // Score the string and check if we improved.
-        int curr_score = score(xored, bytes_len, 10);
+        int curr_score = score(xored, bytes_len, 20);
         if (curr_score < min_score) {
             min_score = curr_score;
             cypher = key;
             best_string = xored;
-            //printf("Best string so far (score = %4d): %s\n", min_score, best_string);
         } else {
             free(xored);
         }
