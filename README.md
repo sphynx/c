@@ -1,8 +1,8 @@
 ## Description
 
 C implementation of some of the projects from the book "Operating
-Systems: Three Easy Pieces", exercises from K&R C book and other study
-projects.
+Systems: Three Easy Pieces", CryptoPals crypto challenges, exercises
+from K&R C book and other study projects.
 
 ## Relevant links
 
@@ -11,3 +11,4 @@ projects.
 * [The book website](http://pages.cs.wisc.edu/~remzi/OSTEP/)
 * [Discussion of the book on
   HackerNews](https://news.ycombinator.com/item?id=18104600)
+* [Crypto challenges](http://cryptopals.com)
