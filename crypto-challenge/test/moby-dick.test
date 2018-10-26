@@ -1,0 +1,10 @@
+$ ../score-tester <../data/moby-dick.txt
+>
+
+total    114
+ok       114
+fail       0
+rate 100.00%
+>= 0
+
+

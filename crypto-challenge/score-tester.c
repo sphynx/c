@@ -30,7 +30,11 @@ int main(void) {
         total++;
     }
 
-    printf("scoring: total[%3d], ok[%3d], fail[%3d], rate=%6.2f%%\n",
+    printf("\n");
+    printf("total %6d\n"
+           "ok    %6d\n"
+           "fail  %6d\n"
+           "rate %6.2f%%\n",
            total, ok, fail, (double) ok / (double) total * 100.0);
 
     return 0;
