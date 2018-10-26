@@ -19,7 +19,7 @@ main(void) {
                expe, actu);
         return 1;
     } else {
-        printf("[OK] Xor test passed\n");
+        printf("[OK] Challenge2 passed\n");
     }
     return 0;
 }

@@ -20,7 +20,7 @@ do
     fi
 done
 
-echo "[OK] Test of ${NUM_OF_RUNS} runs with random data passed"
+echo "[OK] Base64 random test: ${NUM_OF_RUNS} runs passed"
 
 rm ${FILE}
 rm result.mine
