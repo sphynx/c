@@ -6,8 +6,10 @@ challenge4.o: challenge4.c score.h
 challenge5.o: challenge5.c xor.h hex.h
 decode-base64.o: decode-base64.c base64.h io.h
 encode-base64.o: encode-base64.c base64.h io.h
+hamming.o: hamming.c hamming.h
 hex.o: hex.c hex.h
 io.o: io.c io.h
+precalculate-pop-count.o: precalculate-pop-count.c hamming.h
 score-tester.o: score-tester.c score.h xor.h
 score.o: score.c score.h hex.h xor.h
 xor-encoder.o: xor-encoder.c io.h xor.h
