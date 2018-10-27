@@ -1,3 +1,5 @@
+#!/bin/sh
+
 NUM_OF_RUNS=100
 FILE=test.rnd
 for x in $(seq 1 ${NUM_OF_RUNS})

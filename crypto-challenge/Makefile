@@ -25,7 +25,8 @@ clean:
 
 test: $(binaries)
 	@shelltest test --color -p --execdir
-	@test/random_test.sh
+	@test/encode_base64.test.sh
+	@test/encode_decode_round.test.sh
 	@./challenge1
 	@./challenge2
 	@./challenge3
