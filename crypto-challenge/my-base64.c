@@ -11,6 +11,7 @@
 #include <stdlib.h>
 
 #include "base64.h"
+#include "io.h"
 
 int
 main(int argc, char* argv[]) {
@@ -26,32 +27,9 @@ main(int argc, char* argv[]) {
             exit(1);
         }
 
-        // seek to end to determine file size
-        if (fseek(stream, 0, SEEK_END) == -1) {
-            perror("fseek");
-            exit(1);
-        }
-
-        num_bytes = ftell(stream);
-
-        // rewind back to the beginning
-        if (fseek(stream, 0, SEEK_SET) == -1) {
-            perror("fseek");
-            exit(1);
-        }
-
-        // allocate memory, encode and print the result
-        buffer = (uint8_t*) malloc(num_bytes);
-        if (buffer == NULL) {
-            exit(1);
-        }
-
-        if (fread(buffer, 1, num_bytes, stream) != num_bytes) {
-            printf("fread failed\n");
-            exit(1);
-        }
-
+        buffer = get_file_contents(stream, &num_bytes);
         encoded_buffer = base64_encode(buffer, num_bytes);
+
         if (puts(encoded_buffer) < 0) {
             printf("puts failed\n");
             exit(1);
