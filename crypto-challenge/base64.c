@@ -1,14 +1,20 @@
 #include <assert.h>
+#include <ctype.h>
 #include <math.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "base64.h"
 
-typedef unsigned char sextet;
+typedef uint8_t sextet;
+
+/*
+ * ********************************* ENCODING ********************************
+ */
 
 static size_t
-base64_encoded_length(size_t len) {
-    return (size_t) (4 * ceil(len / 3.0));
+base64_encoded_length(size_t bytes_len) {
+    return (size_t) (4 * ceil(bytes_len / 3.0));
 }
 
 static char
@@ -79,12 +85,6 @@ encode_3bytes(uint8_t byte1, uint8_t byte2, uint8_t byte3, char* encoded) {
     }
 }
 
-
-/*
- * Encodes to BASE64, returns a pointer to a newly allocated
- * zero-terminated string or NULL in case of error. Don't forget to
- * free() that string later.
- */
 char*
 base64_encode(uint8_t* from, size_t len) {
     unsigned long i;
@@ -122,5 +122,150 @@ base64_encode(uint8_t* from, size_t len) {
     // Zero-terminate.
     to[to_len] = '\0';
 
+    return to;
+}
+
+
+
+/*
+ * ********************************* DECODING ********************************
+ */
+
+#define DECODE_WRONG_CHAR 64
+
+static uint8_t
+decode_char(char c) {
+    uint8_t res;
+
+    assert(isalnum(c) || c == '+' || c == '/');
+
+    if (isupper(c)) {
+        res = c - 'A';
+    } else if (islower(c)) {
+        res = c - 'a' + 26;
+    } else if (isdigit(c)) {
+        res = c - '0' + 52;
+    } else if (c == '+') {
+        res = 62;
+    } else if (c == '/') {
+        res = 63;
+    } else {
+        fprintf(stderr, "unsupported char: %c\n", c);
+        res = DECODE_WRONG_CHAR;
+    }
+
+    return res;
+}
+
+
+static void
+decode_step_1byte(char* from, uint8_t* to) {
+    // read and decode 2 sextets
+    uint8_t sextet1 = decode_char(*from);
+    uint8_t sextet2 = decode_char(*(from + 1));
+
+    // check for errors
+    assert(sextet1 != DECODE_WRONG_CHAR);
+    assert(sextet2 != DECODE_WRONG_CHAR);
+
+    // now combine 2 sextets (2*6 bits) into a single byte
+    uint8_t byte1 = (sextet1 << 2) | (sextet2 >> 4);
+
+    // write 1 byte
+    *to++ = byte1;
+}
+
+static void
+decode_step_2bytes(char* from, uint8_t* to) {
+    // read and decode 3 sextets
+    uint8_t sextet1 = decode_char(*from);
+    uint8_t sextet2 = decode_char(*(from + 1));
+    uint8_t sextet3 = decode_char(*(from + 2));
+
+    // check for errors
+    assert(sextet1 != DECODE_WRONG_CHAR);
+    assert(sextet2 != DECODE_WRONG_CHAR);
+    assert(sextet3 != DECODE_WRONG_CHAR);
+
+    // now combine 3 sextets (3*6 bits) into 2 bytes
+    uint8_t byte1 = (sextet1 << 2) | (sextet2 >> 4);
+    uint8_t byte2 = (sextet2 << 4) | (sextet3 >> 2);
+
+    // write 2 bytes
+    *to++ = byte1;
+    *to++ = byte2;
+}
+
+static void
+decode_step_3bytes(char* from, uint8_t* to) {
+    // read and decode 4 chars into 4 sextets
+    uint8_t sextet1 = decode_char(*from);
+    uint8_t sextet2 = decode_char(*(from + 1));
+    uint8_t sextet3 = decode_char(*(from + 2));
+    uint8_t sextet4 = decode_char(*(from + 3));
+
+    // check for errors
+    assert(sextet1 != DECODE_WRONG_CHAR);
+    assert(sextet2 != DECODE_WRONG_CHAR);
+    assert(sextet3 != DECODE_WRONG_CHAR);
+    assert(sextet4 != DECODE_WRONG_CHAR);
+
+    // now combine 4 sextets (4*6 bits) into 3 bytes (3*8)
+    uint8_t byte1 = (sextet1 << 2) | (sextet2 >> 4);
+    uint8_t byte2 = (sextet2 << 4) | (sextet3 >> 2);
+    uint8_t byte3 = (sextet3 << 6) | sextet4;
+
+    // write 3 bytes
+    *to++ = byte1;
+    *to++ = byte2;
+    *to++ = byte3;
+}
+
+uint8_t*
+base64_decode(char* from, size_t* len) {
+    assert(from != NULL && len != NULL);
+
+    // FIXME: we should clean all the whitespace first
+
+    size_t text_len = strlen(from);
+
+    // we assume it is properly padded, so we always have 4-character blocks
+    assert(text_len % 4 == 0);
+
+    // analyze padding
+    char last     = from[text_len - 1];
+    char pre_last = from[text_len - 2];
+
+    int padded_block_len = 0;
+    if (last == '=') {
+        padded_block_len = (pre_last == '=') ? 1 : 2;
+    }
+
+    // determine the size of decoded bytes
+    size_t bytes_len = text_len / 4 * 3 + padded_block_len;
+
+    uint8_t* to = malloc(bytes_len);
+    if (to == NULL) {
+        perror("malloc");
+        return NULL;
+    }
+
+    // read 4-bytes and write 3-bytes on each step
+    unsigned long i;
+    for (i = 0; i < text_len / 4 - 1; i++) {
+        decode_step_3bytes(&from[4 * i], &to[3 * i]);
+    }
+
+    // handle the last block now (possibly with paddin)
+    if (padded_block_len == 0) {
+        // just go on as normal, no padding
+        decode_step_3bytes(&from[4 * i], &to[3 * i]);
+    } else if (padded_block_len == 1) {
+        decode_step_1byte(&from[4 * i], &to[3 * i]);
+    } else if (padded_block_len == 2) {
+        decode_step_2bytes(&from[4 * i], &to[3 * i]);
+    }
+
+    *len = bytes_len;
     return to;
 }
