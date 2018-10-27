@@ -2,7 +2,7 @@ CFLAGS = -g -Wall -Wextra -Werror -pedantic -std=c99
 
 binaries = encode-base64 decode-base64 score-tester xor-encoder \
 	challenge1 challenge2 challenge3 challenge4 challenge5 \
-	precalculate-pop-count
+	precalculate-pop-count break-xor
 target = $(lastword $(binaries))
 
 all: $(binaries)
@@ -17,6 +17,7 @@ decode-base64: base64.o io.o
 score-tester: hex.o score.o xor.o
 xor-encoder: hex.o io.o xor.o
 precalculate-pop-count: hamming.o
+break-xor: base64.o hamming.o hex.o io.o score.o xor.o
 
 include depend
 

@@ -1,4 +1,5 @@
 base64.o: base64.c base64.h
+break-xor.o: break-xor.c base64.h hamming.h io.h score.h xor.h
 challenge1.o: challenge1.c base64.h hex.h
 challenge2.o: challenge2.c xor.h
 challenge3.o: challenge3.c score.h hex.h xor.h

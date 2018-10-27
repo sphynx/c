@@ -46,7 +46,24 @@ uint8_t* xor_with_byte_key(uint8_t* msg, uint8_t key, size_t len) {
     return xor_with_repeating_key(msg, len, &key, 1);
 }
 
-uint8_t* xor_with_repeating_key(uint8_t* msg, size_t msg_len, uint8_t* key, size_t key_len) {
+uint8_t* xor_with_byte_key_step(uint8_t* msg, uint8_t key, size_t len,
+                                size_t start, size_t step) {
+    uint8_t* res = malloc(len);
+    if (res == NULL) {
+        printf("out of memory\n");
+        return NULL;
+    }
+
+    for (size_t i = start; i < len; i += step) {
+        res[i] = msg[i] ^ key;
+    }
+
+    return res;
+}
+
+uint8_t* xor_with_repeating_key(uint8_t* msg, size_t msg_len,
+                                uint8_t* key, size_t key_len) {
+
     uint8_t* res = malloc(msg_len);
     if (res == NULL) {
         printf("out of memory\n");

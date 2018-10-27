@@ -48,3 +48,13 @@ hamming_distance(char* s1, char* s2) {
 
     return distance;
 }
+
+size_t
+hamming_distance_bytes(uint8_t* b1, uint8_t* b2, size_t len) {
+    size_t distance = 0;
+    for (unsigned long i = 0; i < len; i++) {
+        distance += pop_count(b1[i] ^ b2[i]);
+    }
+
+    return distance;
+}

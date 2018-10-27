@@ -19,3 +19,4 @@ crypto-challenge/challenge5
 crypto-challenge/score-tester
 crypto-challenge/xor-encoder
 crypto-challenge/precalculate-pop-count
+crypto-challenge/break-xor

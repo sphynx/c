@@ -29,3 +29,11 @@ best_score_hex(char* hex_str, char** res_str);
  */
 int
 best_score_raw(uint8_t* bytes, size_t bytes_len, char** res_str);
+
+/*
+ * Returns the key corresponding to the best score for byte buffer
+ * when only every `step`-th byte starting from byte `start` is taken
+ * into account.
+ */
+uint8_t
+best_key_step(uint8_t* bytes, size_t bytes_len, size_t start, size_t step);
