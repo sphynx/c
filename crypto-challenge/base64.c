@@ -234,13 +234,13 @@ base64_decode(char* from, size_t* len) {
     char last     = from[text_len - 1];
     char pre_last = from[text_len - 2];
 
-    int padded_block_len = 0;
+    int last_block_len = 3;
     if (last == '=') {
-        padded_block_len = (pre_last == '=') ? 1 : 2;
+        last_block_len = (pre_last == '=') ? 1 : 2;
     }
 
     // determine the size of decoded bytes
-    size_t bytes_len = text_len / 4 * 3 + padded_block_len;
+    size_t bytes_len = (text_len / 4 - 1) * 3 + last_block_len;
 
     uint8_t* to = malloc(bytes_len);
     if (to == NULL) {
@@ -255,12 +255,12 @@ base64_decode(char* from, size_t* len) {
     }
 
     // handle the last block now (possibly with paddin)
-    if (padded_block_len == 0) {
+    if (last_block_len == 3) {
         // just go on as normal, no padding
         decode_step_3bytes(&from[4 * i], &to[3 * i]);
-    } else if (padded_block_len == 1) {
+    } else if (last_block_len == 1) {
         decode_step_1byte(&from[4 * i], &to[3 * i]);
-    } else if (padded_block_len == 2) {
+    } else if (last_block_len == 2) {
         decode_step_2bytes(&from[4 * i], &to[3 * i]);
     }
 
