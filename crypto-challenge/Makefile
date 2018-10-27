@@ -1,12 +1,12 @@
 CFLAGS = -g -Wall -Wextra -Werror -pedantic -std=c99
 
-binaries = my-base64 decode-base64 score-tester challenge1 challenge2 challenge3 \
-	challenge4 challenge5 xor-encoder
+binaries = encode-base64 decode-base64 score-tester xor-encoder \
+	challenge1 challenge2 challenge3 challenge4 challenge5
 target = $(lastword $(binaries))
 
 all: $(binaries)
 
-my-base64: base64.o io.o
+encode-base64: base64.o io.o
 decode-base64: base64.o io.o
 score-tester: hex.o score.o xor.o
 xor-encoder: hex.o io.o xor.o
