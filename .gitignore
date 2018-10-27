@@ -10,6 +10,7 @@ grep/my-grep
 zip/my-zip
 zip/my-unzip
 crypto-challenge/my-base64
+crypto-challenge/decode-base64
 crypto-challenge/challenge1
 crypto-challenge/challenge2
 crypto-challenge/challenge3

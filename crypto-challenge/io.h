@@ -13,3 +13,11 @@
  * wrong.
  */
 uint8_t* get_file_contents(FILE* stream, size_t* len);
+
+
+/*
+ * Reads all non-space characters from the stream (skipping SPC, TAB
+ * and end of lines), returns a newly allocated NUL-terminated string
+ * or NULL if something goes wrong.
+ */
+char* read_non_space(FILE* stream);

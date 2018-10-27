@@ -225,8 +225,6 @@ uint8_t*
 base64_decode(char* from, size_t* len) {
     assert(from != NULL && len != NULL);
 
-    // FIXME: we should clean all the whitespace first
-
     size_t text_len = strlen(from);
 
     // we assume it is properly padded, so we always have 4-character blocks
