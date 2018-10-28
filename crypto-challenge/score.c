@@ -136,12 +136,7 @@ best_key_step(uint8_t* bytes, size_t bytes_len, size_t start, size_t step) {
     uint8_t best_key = 0;
     uint8_t key = 0;
     for (;;) {
-        // Xor them with the current key.
-
-        uint8_t* xored = xor_with_byte_key_step(bytes, key, bytes_len,
-                                                start, step);
-
-        // Score the string and check if we improved.
+        uint8_t* xored = xor_with_byte_key(bytes, key, bytes_len);
         int curr_score = score_step(xored, bytes_len, SIGNIFICANT_LETTERS,
                                     start, step);
         if (curr_score < min_score) {
