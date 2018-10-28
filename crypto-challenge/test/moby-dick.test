@@ -1,10 +1,4 @@
-$ ../score-tester <../data/moby-dick.txt
+$ ../score-tester ../data/moby-dick.txt | grep --binary-files=text rate | tail -1
 >
-
-total    114
-ok       114
-fail       0
-rate 100.00%
+rate  94.77%
 >= 0
-
-
