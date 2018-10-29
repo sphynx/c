@@ -32,11 +32,7 @@ print_key(uint8_t* key, size_t len) {
 }
 
 int main(void) {
-    FILE* stream = fopen("data/6.txt", "rb");
-    if (stream == NULL) {
-        perror("fopen");
-        exit(1);
-    }
+    FILE* stream = stdin;
 
     char* b64text = read_non_space(stream);
     if (b64text == NULL) {
