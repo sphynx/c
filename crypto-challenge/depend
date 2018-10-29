@@ -5,7 +5,23 @@ challenge3.o: challenge3.c score.h hex.h xor.h
 challenge4.o: challenge4.c score.h
 challenge5.o: challenge5.c xor.h hex.h
 challenge6.o: challenge6.c base64.h hamming.h io.h score.h xor.h
-challenge7.o: challenge7.c
+challenge7.o: challenge7.c /usr/local/opt/openssl/include/openssl/conf.h \
+  /usr/local/opt/openssl/include/openssl/bio.h \
+  /usr/local/opt/openssl/include/openssl/e_os2.h \
+  /usr/local/opt/openssl/include/openssl/opensslconf.h \
+  /usr/local/opt/openssl/include/openssl/crypto.h \
+  /usr/local/opt/openssl/include/openssl/stack.h \
+  /usr/local/opt/openssl/include/openssl/safestack.h \
+  /usr/local/opt/openssl/include/openssl/opensslv.h \
+  /usr/local/opt/openssl/include/openssl/ossl_typ.h \
+  /usr/local/opt/openssl/include/openssl/symhacks.h \
+  /usr/local/opt/openssl/include/openssl/lhash.h \
+  /usr/local/opt/openssl/include/openssl/evp.h \
+  /usr/local/opt/openssl/include/openssl/objects.h \
+  /usr/local/opt/openssl/include/openssl/obj_mac.h \
+  /usr/local/opt/openssl/include/openssl/asn1.h \
+  /usr/local/opt/openssl/include/openssl/bn.h \
+  /usr/local/opt/openssl/include/openssl/err.h base64.h io.h
 decode-base64.o: decode-base64.c base64.h io.h
 encode-base64.o: encode-base64.c base64.h io.h
 hamming.o: hamming.c hamming.h
