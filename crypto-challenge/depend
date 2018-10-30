@@ -22,6 +22,7 @@ challenge7.o: challenge7.c /usr/local/opt/openssl/include/openssl/conf.h \
   /usr/local/opt/openssl/include/openssl/asn1.h \
   /usr/local/opt/openssl/include/openssl/bn.h \
   /usr/local/opt/openssl/include/openssl/err.h base64.h io.h
+challenge8.o: challenge8.c hex.h
 decode-base64.o: decode-base64.c base64.h io.h
 encode-base64.o: encode-base64.c base64.h io.h
 hamming.o: hamming.c hamming.h

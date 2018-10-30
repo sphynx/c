@@ -5,7 +5,7 @@ VPATH = /usr/local/opt/openssl/lib
 
 binaries = encode-base64 decode-base64 score-tester xor-encoder \
 	challenge1 challenge2 challenge3 challenge4 challenge5 challenge6 \
-	precalculate-pop-count challenge7
+	precalculate-pop-count challenge7 challenge8
 target = $(lastword $(binaries))
 
 all: $(binaries)
@@ -17,6 +17,7 @@ challenge4: hex.o score.o xor.o
 challenge5: hex.o score.o xor.o
 challenge6: base64.o hamming.o hex.o io.o score.o xor.o
 challenge7: -lcrypto base64.o io.o
+challenge8: hex.o
 encode-base64: base64.o io.o
 decode-base64: base64.o io.o
 score-tester: hex.o score.o xor.o
