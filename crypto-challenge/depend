@@ -1,5 +1,6 @@
 base64.o: base64.c base64.h
 challenge1.o: challenge1.c base64.h hex.h
+challenge2-1.o: challenge2-1.c pkcs7-padding.h
 challenge2.o: challenge2.c xor.h
 challenge3.o: challenge3.c score.h hex.h xor.h
 challenge4.o: challenge4.c score.h
@@ -28,6 +29,7 @@ encode-base64.o: encode-base64.c base64.h io.h
 hamming.o: hamming.c hamming.h
 hex.o: hex.c hex.h
 io.o: io.c io.h
+pkcs7-padding.o: pkcs7-padding.c pkcs7-padding.h
 precalculate-pop-count.o: precalculate-pop-count.c hamming.h
 score-tester.o: score-tester.c score.h xor.h
 score.o: score.c score.h hex.h xor.h

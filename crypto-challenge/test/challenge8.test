@@ -1,0 +1,9 @@
+$ ../challenge8 <../data/8.txt
+>
+found equal blocks, line: 133, i: 1, j: 3
+found equal blocks, line: 133, i: 1, j: 5
+found equal blocks, line: 133, i: 1, j: 7
+found equal blocks, line: 133, i: 3, j: 5
+found equal blocks, line: 133, i: 3, j: 7
+found equal blocks, line: 133, i: 5, j: 7
+>=0
