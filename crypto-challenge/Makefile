@@ -33,7 +33,7 @@ clean:
 	$(RM) -r -f $(binaries) *.o *.gch *.dSYM
 
 test: $(binaries)
-	@shelltest test --color -p --execdir
+	shelltest test -p -a --color --execdir
 	@test/encode_base64.test.sh
 	@test/encode_decode_round.test.sh
 	@./challenge1
