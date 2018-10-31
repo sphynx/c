@@ -1,56 +1,8 @@
-/*
- * Based on OpenSSL wiki:
- * https://wiki.openssl.org/index.php/EVP_Symmetric_Encryption_and_Decryption
- */
-
-#include <openssl/conf.h>
-#include <openssl/evp.h>
-#include <openssl/err.h>
 #include <string.h>
 
 #include "base64.h"
 #include "io.h"
-
-void handleErrors(void) {
-    ERR_print_errors_fp(stderr);
-    abort();
-}
-
-int decrypt(unsigned char *ciphertext, int ciphertext_len,
-            unsigned char *key, unsigned char *plaintext) {
-
-    // Create and initialise the context.
-    EVP_CIPHER_CTX *ctx = EVP_CIPHER_CTX_new();
-    if (ctx == NULL) {
-        handleErrors();
-    }
-
-    // Initialise the decryption operation.
-    if (1 != EVP_DecryptInit_ex(ctx, EVP_aes_128_ecb(), NULL, key, NULL)) {
-        handleErrors();
-    }
-
-    // Provide the message to be decrypted, and obtain the plaintext
-    // output. EVP_DecryptUpdate can be called multiple times if
-    // necessary.
-    int len;
-    if (1 != EVP_DecryptUpdate(ctx, plaintext, &len, ciphertext, ciphertext_len)) {
-        handleErrors();
-    }
-    int plaintext_len = len;
-
-    // Finalise the decryption. Further plaintext bytes may be written
-    // at this stage.
-    if (1 != EVP_DecryptFinal_ex(ctx, plaintext + len, &len)) {
-        handleErrors();
-    }
-    plaintext_len += len;
-
-    // Clean up.
-    EVP_CIPHER_CTX_free(ctx);
-
-    return plaintext_len;
-}
+#include "aes.h"
 
 int main(void) {
     char* b64text = read_non_space(stdin);
@@ -64,8 +16,14 @@ int main(void) {
 
     unsigned char* key = (unsigned char*) "YELLOW SUBMARINE"; // 128 bit
 
-    unsigned char* decrypted = malloc(2 * cyphertext_len);
-    int decrypted_len = decrypt(cyphertext, cyphertext_len, key, decrypted);
+    unsigned char* decrypted = malloc(cyphertext_len + 16); // inl + block_size
+
+    EVP_CIPHER_CTX* ctx = evp_init();
+    int decrypted_len = evp_decrypt(ctx, cyphertext, cyphertext_len, key, decrypted);
+    if (decrypted_len == -1) {
+        handle_evp_errors();
+    }
+    evp_cleanup(ctx);
 
     // NUL-terminate.
     decrypted[decrypted_len] = '\0';

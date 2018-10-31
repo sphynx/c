@@ -16,7 +16,7 @@ challenge3: hex.o score.o xor.o
 challenge4: hex.o score.o xor.o
 challenge5: hex.o score.o xor.o
 challenge6: base64.o hamming.o hex.o io.o score.o xor.o
-challenge7: -lcrypto base64.o io.o
+challenge7: -lcrypto base64.o io.o aes.o
 challenge8: hex.o
 challenge9: pkcs7-padding.o
 encode-base64: base64.o io.o
