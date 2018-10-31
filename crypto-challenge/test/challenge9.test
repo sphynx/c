@@ -1,4 +1,4 @@
-$ ../challenge2-1 | hexdump 
+$ ../challenge9 | hexdump
 >
 0000000 59 45 4c 4c 4f 57 20 53 55 42 4d 41 52 49 4e 45
 0000010 04 04 04 04                                    

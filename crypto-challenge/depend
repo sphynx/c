@@ -1,6 +1,5 @@
 base64.o: base64.c base64.h
 challenge1.o: challenge1.c base64.h hex.h
-challenge2-1.o: challenge2-1.c pkcs7-padding.h
 challenge2.o: challenge2.c xor.h
 challenge3.o: challenge3.c score.h hex.h xor.h
 challenge4.o: challenge4.c score.h
@@ -24,6 +23,7 @@ challenge7.o: challenge7.c /usr/local/opt/openssl/include/openssl/conf.h \
   /usr/local/opt/openssl/include/openssl/bn.h \
   /usr/local/opt/openssl/include/openssl/err.h base64.h io.h
 challenge8.o: challenge8.c hex.h
+challenge9.o: challenge9.c pkcs7-padding.h
 decode-base64.o: decode-base64.c base64.h io.h
 encode-base64.o: encode-base64.c base64.h io.h
 hamming.o: hamming.c hamming.h
