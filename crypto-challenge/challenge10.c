@@ -15,11 +15,12 @@ int main(void) {
     uint8_t* cyphertext = base64_decode(b64text, &cyphertext_len);
 
     unsigned char* key = (unsigned char*) "YELLOW SUBMARINE"; // 128 bit
+    unsigned char iv[16] = {0};
 
     unsigned char* decrypted = malloc(cyphertext_len + 16); // inl + block_size
 
     EVP_CIPHER_CTX* ctx = evp_init();
-    int decrypted_len = aes_128_ecb_decrypt(ctx, cyphertext, cyphertext_len, key, decrypted);
+    int decrypted_len = aes_128_cbc_decrypt(ctx, cyphertext, cyphertext_len, key, iv, decrypted);
     if (decrypted_len == -1) {
         handle_evp_errors();
     }
