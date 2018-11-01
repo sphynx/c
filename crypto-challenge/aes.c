@@ -2,6 +2,7 @@
 #include <string.h>
 #include <openssl/conf.h>
 #include <openssl/err.h>
+#include <openssl/aes.h>
 
 #include "aes.h"
 #include "xor.h"
@@ -36,11 +37,11 @@ aes_128_ecb_decrypt(EVP_CIPHER_CTX *ctx, unsigned char *in,
     return total_len;
 }
 
-
+// Decrypting using OpenSSL's high-level EVP interface.
 int
-aes_128_cbc_decrypt(EVP_CIPHER_CTX *ctx, unsigned char *in,
-                    int in_len, unsigned char *key, unsigned char *iv,
-                    unsigned char *out) {
+evp_aes_128_cbc_decrypt(EVP_CIPHER_CTX *ctx, unsigned char *in,
+                        int in_len, unsigned char *key, unsigned char *iv,
+                        unsigned char *out) {
 
     int curr_out_len = 0;
     int total_len = 0;
@@ -83,11 +84,39 @@ aes_128_cbc_decrypt(EVP_CIPHER_CTX *ctx, unsigned char *in,
 
     assert(curr_out_len == 0);
 
-    // total_len += curr_out_len;
-
     return total_len;
 }
 
+// CBC mode using low-level interface.
+int
+aes_128_cbc_decrypt(unsigned char *in, int in_len,
+                    unsigned char *key, unsigned char *iv,
+                    unsigned char *out) {
+
+    int no_of_blocks = in_len / AES_BLOCK_SIZE;
+    unsigned char* curr_out = out;
+    unsigned char* curr_in = in;
+    unsigned char* prev_in = iv;
+    unsigned char* xored;
+    AES_KEY aes_key;
+
+    // We do not expect padding for now.
+    assert(in_len % AES_BLOCK_SIZE == 0);
+
+    AES_set_decrypt_key(key, 128, &aes_key);
+
+    for (int i = 0; i < no_of_blocks; i++) {
+        AES_decrypt(curr_in, curr_out, &aes_key);
+        xored = xor(curr_out, prev_in, AES_BLOCK_SIZE);
+        memcpy(curr_out, xored, AES_BLOCK_SIZE);
+        prev_in = curr_in;
+        curr_in += AES_BLOCK_SIZE;
+        curr_out += AES_BLOCK_SIZE;
+        free(xored);
+    }
+
+    return curr_out - out;
+}
 
 
 int

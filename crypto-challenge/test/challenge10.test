@@ -1,0 +1,4 @@
+$ ../challenge10 <../data/10.txt | grep Intox
+>
+Intoxicating so you stagger like a wino 
+>= 0

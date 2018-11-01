@@ -21,13 +21,30 @@ aes_128_ecb_decrypt(EVP_CIPHER_CTX* ctx,
                     unsigned char *out);
 
 /*
- * Decrypts AES-encoded data in CBC mode. Takes byte string in, its
- * length, the key and IV (should be both 128 bit). Writes output to
- * *out. Its size is returned. Returns the size of the output or -1 if
- * anything goes wrong. Use handle_errors() to print error message.
+ * Decrypts AES-encoded data in CBC mode using EVP interface. Takes
+ * byte string in, its length, the key and IV (should be both 128
+ * bit). Writes output to *out. Its size is returned. Returns the size
+ * of the output or -1 if anything goes wrong. Use handle_errors() to
+ * print error message.
  */
 int
-aes_128_cbc_decrypt(EVP_CIPHER_CTX* ctx,
+evp_aes_128_cbc_decrypt(EVP_CIPHER_CTX* ctx,
+                        unsigned char *in,
+                        int in_len,
+                        unsigned char *key,
+                        unsigned char *iv,
+                        unsigned char *out);
+
+
+/*
+ * Decrypts AES-encoded data in CBC mode using low-level OpenSSL
+ * interface. Takes byte string in, its length, the key and IV (should
+ * be both 128 bit). Writes output to *out. Its size is returned.
+ * Returns the size of the output or -1 if anything goes wrong. Use
+ * handle_errors() to print error message.
+ */
+int
+aes_128_cbc_decrypt(
                     unsigned char *in,
                     int in_len,
                     unsigned char *key,

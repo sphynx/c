@@ -19,12 +19,7 @@ int main(void) {
 
     unsigned char* decrypted = malloc(cyphertext_len + 16); // inl + block_size
 
-    EVP_CIPHER_CTX* ctx = evp_init();
-    int decrypted_len = aes_128_cbc_decrypt(ctx, cyphertext, cyphertext_len, key, iv, decrypted);
-    if (decrypted_len == -1) {
-        handle_evp_errors();
-    }
-    evp_cleanup(ctx);
+    int decrypted_len = aes_128_cbc_decrypt(cyphertext, cyphertext_len, key, iv, decrypted);
 
     // NUL-terminate.
     decrypted[decrypted_len] = '\0';

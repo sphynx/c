@@ -9,7 +9,8 @@ aes.o: aes.c /usr/local/opt/openssl/include/openssl/conf.h \
   /usr/local/opt/openssl/include/openssl/ossl_typ.h \
   /usr/local/opt/openssl/include/openssl/symhacks.h \
   /usr/local/opt/openssl/include/openssl/lhash.h \
-  /usr/local/opt/openssl/include/openssl/err.h aes.h \
+  /usr/local/opt/openssl/include/openssl/err.h \
+  /usr/local/opt/openssl/include/openssl/aes.h aes.h \
   /usr/local/opt/openssl/include/openssl/evp.h \
   /usr/local/opt/openssl/include/openssl/objects.h \
   /usr/local/opt/openssl/include/openssl/obj_mac.h \
