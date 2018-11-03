@@ -14,11 +14,11 @@ EVP_CIPHER_CTX* evp_init(void);
  * goes wrong. Use handle_errors() to print error message.
  */
 int
-aes_128_ecb_decrypt(EVP_CIPHER_CTX* ctx,
-                    unsigned char *in,
-                    int in_len,
-                    unsigned char *key,
-                    unsigned char *out);
+evp_aes_128_ecb_decrypt(EVP_CIPHER_CTX* ctx,
+                        unsigned char *in,
+                        int in_len,
+                        unsigned char *key,
+                        unsigned char *out);
 
 /*
  * Decrypts AES-encoded data in CBC mode using EVP interface. Takes

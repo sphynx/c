@@ -13,9 +13,9 @@ evp_init(void) {
 }
 
 int
-aes_128_ecb_decrypt(EVP_CIPHER_CTX *ctx, unsigned char *in,
-                    int in_len, unsigned char *key,
-                    unsigned char *out) {
+evp_aes_128_ecb_decrypt(EVP_CIPHER_CTX *ctx, unsigned char *in,
+                        int in_len, unsigned char *key,
+                        unsigned char *out) {
 
     int curr_out_len = 0;
     int total_len = 0;
