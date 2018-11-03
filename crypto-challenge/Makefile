@@ -1,7 +1,9 @@
+# change to your open SSL installation
+OPEN_SSL = /usr/local/opt/openssl-debug
 CFLAGS = -g -Wall -Wextra -Werror -pedantic -std=c99
-LDFLAGS = -L/usr/local/opt/openssl/lib
-CPPFLAGS = -I/usr/local/opt/openssl/include
-VPATH = /usr/local/opt/openssl/lib
+LDFLAGS = -L$(OPEN_SSL)/lib
+CPPFLAGS = -I$(OPEN_SSL)/include
+vpath %.a $(OPEN_SSL)/lib
 
 binaries = encode-base64 decode-base64 score-tester xor-encoder \
 	challenge1 challenge2 challenge3 challenge4 challenge5 challenge6 \
@@ -26,7 +28,7 @@ score-tester: hex.o score.o xor.o
 xor-encoder: hex.o io.o xor.o
 precalculate-pop-count: hamming.o
 
-include depend
+# include depend
 
 .PHONY: clean test depend
 

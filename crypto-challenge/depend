@@ -1,58 +1,77 @@
-aes.o: aes.c /usr/local/opt/openssl/include/openssl/conf.h \
-  /usr/local/opt/openssl/include/openssl/bio.h \
-  /usr/local/opt/openssl/include/openssl/e_os2.h \
-  /usr/local/opt/openssl/include/openssl/opensslconf.h \
-  /usr/local/opt/openssl/include/openssl/crypto.h \
-  /usr/local/opt/openssl/include/openssl/stack.h \
-  /usr/local/opt/openssl/include/openssl/safestack.h \
-  /usr/local/opt/openssl/include/openssl/opensslv.h \
-  /usr/local/opt/openssl/include/openssl/ossl_typ.h \
-  /usr/local/opt/openssl/include/openssl/symhacks.h \
-  /usr/local/opt/openssl/include/openssl/lhash.h \
-  /usr/local/opt/openssl/include/openssl/err.h \
-  /usr/local/opt/openssl/include/openssl/aes.h aes.h \
-  /usr/local/opt/openssl/include/openssl/evp.h \
-  /usr/local/opt/openssl/include/openssl/objects.h \
-  /usr/local/opt/openssl/include/openssl/obj_mac.h \
-  /usr/local/opt/openssl/include/openssl/asn1.h \
-  /usr/local/opt/openssl/include/openssl/bn.h xor.h
+aes.o: aes.c /usr/local/opt/openssl-debug/include/openssl/conf.h \
+  /usr/local/opt/openssl-debug/include/openssl/bio.h \
+  /usr/local/opt/openssl-debug/include/openssl/e_os2.h \
+  /usr/local/opt/openssl-debug/include/openssl/opensslconf.h \
+  /usr/local/opt/openssl-debug/include/openssl/opensslv.h \
+  /usr/local/opt/openssl-debug/include/openssl/crypto.h \
+  /usr/local/opt/openssl-debug/include/openssl/safestack.h \
+  /usr/local/opt/openssl-debug/include/openssl/stack.h \
+  /usr/local/opt/openssl-debug/include/openssl/ossl_typ.h \
+  /usr/local/opt/openssl-debug/include/openssl/cryptoerr.h \
+  /usr/local/opt/openssl-debug/include/openssl/symhacks.h \
+  /usr/local/opt/openssl-debug/include/openssl/bioerr.h \
+  /usr/local/opt/openssl-debug/include/openssl/lhash.h \
+  /usr/local/opt/openssl-debug/include/openssl/conferr.h \
+  /usr/local/opt/openssl-debug/include/openssl/err.h \
+  /usr/local/opt/openssl-debug/include/openssl/aes.h aes.h \
+  /usr/local/opt/openssl-debug/include/openssl/evp.h \
+  /usr/local/opt/openssl-debug/include/openssl/evperr.h \
+  /usr/local/opt/openssl-debug/include/openssl/objects.h \
+  /usr/local/opt/openssl-debug/include/openssl/obj_mac.h \
+  /usr/local/opt/openssl-debug/include/openssl/asn1.h \
+  /usr/local/opt/openssl-debug/include/openssl/asn1err.h \
+  /usr/local/opt/openssl-debug/include/openssl/bn.h \
+  /usr/local/opt/openssl-debug/include/openssl/bnerr.h \
+  /usr/local/opt/openssl-debug/include/openssl/objectserr.h xor.h
 base64.o: base64.c base64.h
 challenge1.o: challenge1.c base64.h hex.h
 challenge10.o: challenge10.c base64.h io.h aes.h \
-  /usr/local/opt/openssl/include/openssl/evp.h \
-  /usr/local/opt/openssl/include/openssl/opensslconf.h \
-  /usr/local/opt/openssl/include/openssl/ossl_typ.h \
-  /usr/local/opt/openssl/include/openssl/e_os2.h \
-  /usr/local/opt/openssl/include/openssl/symhacks.h \
-  /usr/local/opt/openssl/include/openssl/bio.h \
-  /usr/local/opt/openssl/include/openssl/crypto.h \
-  /usr/local/opt/openssl/include/openssl/stack.h \
-  /usr/local/opt/openssl/include/openssl/safestack.h \
-  /usr/local/opt/openssl/include/openssl/opensslv.h \
-  /usr/local/opt/openssl/include/openssl/objects.h \
-  /usr/local/opt/openssl/include/openssl/obj_mac.h \
-  /usr/local/opt/openssl/include/openssl/asn1.h \
-  /usr/local/opt/openssl/include/openssl/bn.h
+  /usr/local/opt/openssl-debug/include/openssl/evp.h \
+  /usr/local/opt/openssl-debug/include/openssl/opensslconf.h \
+  /usr/local/opt/openssl-debug/include/openssl/opensslv.h \
+  /usr/local/opt/openssl-debug/include/openssl/ossl_typ.h \
+  /usr/local/opt/openssl-debug/include/openssl/e_os2.h \
+  /usr/local/opt/openssl-debug/include/openssl/symhacks.h \
+  /usr/local/opt/openssl-debug/include/openssl/bio.h \
+  /usr/local/opt/openssl-debug/include/openssl/crypto.h \
+  /usr/local/opt/openssl-debug/include/openssl/safestack.h \
+  /usr/local/opt/openssl-debug/include/openssl/stack.h \
+  /usr/local/opt/openssl-debug/include/openssl/cryptoerr.h \
+  /usr/local/opt/openssl-debug/include/openssl/bioerr.h \
+  /usr/local/opt/openssl-debug/include/openssl/evperr.h \
+  /usr/local/opt/openssl-debug/include/openssl/objects.h \
+  /usr/local/opt/openssl-debug/include/openssl/obj_mac.h \
+  /usr/local/opt/openssl-debug/include/openssl/asn1.h \
+  /usr/local/opt/openssl-debug/include/openssl/asn1err.h \
+  /usr/local/opt/openssl-debug/include/openssl/bn.h \
+  /usr/local/opt/openssl-debug/include/openssl/bnerr.h \
+  /usr/local/opt/openssl-debug/include/openssl/objectserr.h
 challenge2.o: challenge2.c xor.h
 challenge3.o: challenge3.c score.h hex.h xor.h
 challenge4.o: challenge4.c score.h
 challenge5.o: challenge5.c xor.h hex.h
 challenge6.o: challenge6.c base64.h hamming.h io.h score.h xor.h
 challenge7.o: challenge7.c base64.h io.h aes.h \
-  /usr/local/opt/openssl/include/openssl/evp.h \
-  /usr/local/opt/openssl/include/openssl/opensslconf.h \
-  /usr/local/opt/openssl/include/openssl/ossl_typ.h \
-  /usr/local/opt/openssl/include/openssl/e_os2.h \
-  /usr/local/opt/openssl/include/openssl/symhacks.h \
-  /usr/local/opt/openssl/include/openssl/bio.h \
-  /usr/local/opt/openssl/include/openssl/crypto.h \
-  /usr/local/opt/openssl/include/openssl/stack.h \
-  /usr/local/opt/openssl/include/openssl/safestack.h \
-  /usr/local/opt/openssl/include/openssl/opensslv.h \
-  /usr/local/opt/openssl/include/openssl/objects.h \
-  /usr/local/opt/openssl/include/openssl/obj_mac.h \
-  /usr/local/opt/openssl/include/openssl/asn1.h \
-  /usr/local/opt/openssl/include/openssl/bn.h
+  /usr/local/opt/openssl-debug/include/openssl/evp.h \
+  /usr/local/opt/openssl-debug/include/openssl/opensslconf.h \
+  /usr/local/opt/openssl-debug/include/openssl/opensslv.h \
+  /usr/local/opt/openssl-debug/include/openssl/ossl_typ.h \
+  /usr/local/opt/openssl-debug/include/openssl/e_os2.h \
+  /usr/local/opt/openssl-debug/include/openssl/symhacks.h \
+  /usr/local/opt/openssl-debug/include/openssl/bio.h \
+  /usr/local/opt/openssl-debug/include/openssl/crypto.h \
+  /usr/local/opt/openssl-debug/include/openssl/safestack.h \
+  /usr/local/opt/openssl-debug/include/openssl/stack.h \
+  /usr/local/opt/openssl-debug/include/openssl/cryptoerr.h \
+  /usr/local/opt/openssl-debug/include/openssl/bioerr.h \
+  /usr/local/opt/openssl-debug/include/openssl/evperr.h \
+  /usr/local/opt/openssl-debug/include/openssl/objects.h \
+  /usr/local/opt/openssl-debug/include/openssl/obj_mac.h \
+  /usr/local/opt/openssl-debug/include/openssl/asn1.h \
+  /usr/local/opt/openssl-debug/include/openssl/asn1err.h \
+  /usr/local/opt/openssl-debug/include/openssl/bn.h \
+  /usr/local/opt/openssl-debug/include/openssl/bnerr.h \
+  /usr/local/opt/openssl-debug/include/openssl/objectserr.h
 challenge8.o: challenge8.c hex.h
 challenge9.o: challenge9.c pkcs7-padding.h
 decode-base64.o: decode-base64.c base64.h io.h
