@@ -7,7 +7,8 @@ vpath %.a $(OPEN_SSL)/lib
 
 binaries = encode-base64 decode-base64 score-tester xor-encoder \
 	challenge1 challenge2 challenge3 challenge4 challenge5 challenge6 \
-	precalculate-pop-count challenge7 challenge8 challenge9 challenge10
+	precalculate-pop-count challenge7 challenge8 challenge9 challenge10 \
+	test-padding
 target = $(lastword $(binaries))
 
 all: $(binaries)
@@ -27,6 +28,7 @@ decode-base64: base64.o io.o
 score-tester: hex.o score.o xor.o
 xor-encoder: hex.o io.o xor.o
 precalculate-pop-count: hamming.o
+test-padding: pkcs7-padding.o
 
 # include depend
 
@@ -36,7 +38,6 @@ clean:
 	$(RM) -r -f $(binaries) *.o *.gch *.dSYM
 
 test: $(binaries)
-	shelltest test -p -a --color --execdir
 	@test/encode_base64.test.sh
 	@test/encode_decode_round.test.sh
 	@./challenge1
@@ -44,7 +45,8 @@ test: $(binaries)
 	@./challenge3
 	@./challenge4
 	@./challenge5
-	@./challenge9
+	@./test-padding
+	shelltest test -p -a --color --execdir
 
 depend: *.c
 	$(CC) -MM $(CPPFLAGS) $^ > $@
