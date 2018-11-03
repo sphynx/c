@@ -33,6 +33,8 @@ Navigation:
   n -- next for 'step over', next line basically
   c -- for continue
   s -- for 'step in'
+  finish -- for 'step out' (continues until next `return` from a function)
+  thread return <RET_VALUE> -- exit immediately with optional return value
 
 Show all local vars and arguments:
   fr v
@@ -68,3 +70,7 @@ Backtrace (stacktrace):
 Frame info (for all parameters):
   frame info
 
+Check if there is debug information about symbols:
+
+  image lookup -vn <function_name>
+  See also here: https://lldb.llvm.org/troubleshooting.html
