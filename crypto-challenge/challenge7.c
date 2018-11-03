@@ -19,7 +19,7 @@ int main(void) {
     unsigned char* decrypted = malloc(cyphertext_len + 16); // inl + block_size
 
     EVP_CIPHER_CTX* ctx = evp_init();
-    int decrypted_len = evp_aes_128_ecb_decrypt(ctx, cyphertext, cyphertext_len, key, decrypted);
+    int decrypted_len = evp_ecb_decrypt(ctx, cyphertext, cyphertext_len, key, decrypted);
     if (decrypted_len == -1) {
         handle_evp_errors();
     }
