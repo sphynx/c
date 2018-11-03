@@ -1,4 +1,11 @@
-$ ../challenge10 <../data/10.txt | grep Intox
+# We should decrypt it to that song lyrics.
+$ ../challenge10 <../data/10.txt | grep Intox | sed 's/ *$//g'
 >
-Intoxicating so you stagger like a wino 
+Intoxicating so you stagger like a wino
 >= 0
+
+# There should not be padding at the end. Check the last 5 bytes.
+$ ../challenge10 <../data/10.txt | tail -c 5 | hexdump | sed 's/ *$//g'
+>
+0000000 73 69 63 20 0a
+0000005
