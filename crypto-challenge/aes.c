@@ -120,7 +120,7 @@ aes_128_cbc_decrypt(unsigned char *in, int in_len,
 
 
 int
-aes_128_ecb_encrypt(EVP_CIPHER_CTX* ctx, unsigned char *in,
+evp_aes_128_ecb_encrypt(EVP_CIPHER_CTX* ctx, unsigned char *in,
                     int in_len, unsigned char *key,
                     unsigned char *out) {
 
