@@ -73,3 +73,7 @@ the book), no header files:
   .PHONY: clean
   clean:
      rm -r -f *.o $(binaries) *.dSYM
+
+Resolving of `-l<lib_name>` dependencies:
+
+https://www.gnu.org/software/make/manual/make.html#Libraries_002fSearch
