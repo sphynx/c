@@ -4,7 +4,6 @@ https://lldb.llvm.org/lldb-gdb.html
 https://lldb.llvm.org/tutorial.html
 https://www.objc.io/issues/19-debugging/lldb-debugging/
 
-
 ## Useful lldb commands
 
 Compile with -g for debug info:
@@ -44,6 +43,7 @@ Print variable:
   (char *) $0 = 0x0000000100500000 "ac\n"
 
 Print variable as array (i.e. if you want all buffer, not just until null byte):
+
  (lldb) parray 4 *buffer
  (char *) $1 = 0x0000000100500000 "ac\n" {
    (char) [0] = 'a'
@@ -52,11 +52,34 @@ Print variable as array (i.e. if you want all buffer, not just until null byte):
    (char) [3] = '\0'
  }
 
+ Also, even with more control (to print all 32-elements unsigned char array like this):
+
+ > type summary add -s "${var[0-31]}" "unsigned char [32]"
+ > expr -f bytes -- ctx->final
+     (unsigned char [32]) $27 = [00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00]
+
+ Or even just:
+ > type summary add -s "${var[]}" "unsigned char [32]"
+
+ (empty square brackets after `var` work, because we know the size of
+ array, but won't work for pointers).
+
+ To clear summaries:
+    type summary clear
+
+ Information about formats, summary string, etc.:
+   https://lldb.llvm.org/varformats.html
+
+ Also see discussion and various solutions (some of them outdated) here:
+   https://stackoverflow.com/questions/7062173/view-array-in-lldb-equivalent-of-gdbs-operator-in-xcode-4-1/7138219
+
 If that variable is an array defined as `char arr[10]` and you want to
 see it as 10 character array and not a string, you have to cast it to
 pointer explicitly, otherwise lldb will complain:
 
   parray 10 (char*) arr
+
+  Or use summary string as described before.
 
 Print something as hex:
   p/x
@@ -74,3 +97,15 @@ Check if there is debug information about symbols:
 
   image lookup -vn <function_name>
   See also here: https://lldb.llvm.org/troubleshooting.html
+
+Change default amount of context for printing source code with `f`:
+
+  settings set stop-line-count-before 5
+  settings set stop-line-count-after 5
+
+List source:
+
+  source list
+  l
+
+  `l` has a clever syntax based on regexp argument.

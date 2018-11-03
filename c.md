@@ -84,3 +84,21 @@ _main:
       37:	5d 	popq	%rbp
       38:	c3 	retq
 ```
+
+## Reading C declarators:
+
+To understand what this means:
+```c
+char *(*(**foo [][8])())[];
+```
+
+Or to understand LDDB/GDB pretty-printing trick:
+```
+p *(int(*)[32]) x
+```
+
+You can look at some of those articles and sites:
+
+[http://www.unixwiz.net/techtips/reading-cdecl.html](Stephen Friedl)
+[https://eli.thegreenplace.net/2008/07/18/reading-c-type-declarations](Eli Benderski)
+[https://cdecl.org/](cdecl.org)
