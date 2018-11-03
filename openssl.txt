@@ -1,0 +1,18 @@
+To build a debug no-asm version of OpenSSL and install it in
+/usr/local/opt/openssl-debug:
+
+git clone https://github.com/openssl/openssl.git
+cd openssl
+./config --debug --prefix=/usr/local/opt/openssl-debug no-asm
+make -j8
+make test
+make install
+
+# then edit /etc/man.conf to include generated DEV man pages to MANPATH:
+MANPATH /usr/local/opt/openssl-debug/share/man
+
+# and include this in Makefile to link against this library:
+OPEN_SSL = /usr/local/opt/openssl-debug
+LDFLAGS = -L$(OPEN_SSL)/lib
+CPPFLAGS = -I$(OPEN_SSL)/include
+vpath %.a $(OPEN_SSL)/lib
