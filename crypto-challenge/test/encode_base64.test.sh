@@ -1,6 +1,6 @@
 #!/bin/sh
 
-NUM_OF_RUNS=100
+NUM_OF_RUNS=20
 FILE=test.rnd
 for x in $(seq 1 ${NUM_OF_RUNS})
 do
