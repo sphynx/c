@@ -19,7 +19,8 @@ oracle(unsigned char *in, size_t in_len, unsigned char *out)
     uint32_t end_bytes = arc4random_uniform(6) + 5;
 
     // Allocate a new buffer for input and those extra bytes.
-    unsigned char *new_in = malloc(in_len + begin_bytes + end_bytes);
+    size_t new_in_len = in_len + begin_bytes + end_bytes;
+    unsigned char *new_in = malloc(new_in_len);
     if (new_in == NULL) {
         return -1;
     }
@@ -33,10 +34,10 @@ oracle(unsigned char *in, size_t in_len, unsigned char *out)
     if (arc4random_uniform(2) == 0) {
         unsigned char iv[16];
         init_with_random_bytes(iv, 16);
-        encrypted_len = cbc_encrypt(in, in_len, key, iv, out);
+        encrypted_len = cbc_encrypt(new_in, new_in_len, key, iv, out);
     } else {
         EVP_CIPHER_CTX* ctx = evp_init();
-        encrypted_len = evp_ecb_encrypt(ctx, in, in_len, key, out);
+        encrypted_len = evp_ecb_encrypt(ctx, new_in, new_in_len, key, out);
         evp_cleanup(ctx);
     }
 
@@ -48,7 +49,7 @@ oracle(unsigned char *in, size_t in_len, unsigned char *out)
 int main(void)
 {
     char *test = "HELLO";
-    size_t len = strlen(test) - 1;
+    size_t len = strlen(test);
     unsigned char *str = (unsigned char *) test;
     unsigned char *encrypted = malloc(len + 16);
     int encrypted_len = oracle(str, len, encrypted);
