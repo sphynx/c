@@ -37,52 +37,58 @@ timespec_pace(struct timespec *start, struct timespec *finish, size_t total)
 static void
 measure_gettimeofday(void)
 {
-    struct timeval t[(int)1e6];
-    size_t total = sizeof(t) / sizeof(struct timeval);
+    struct timeval start;
+    struct timeval finish;
+    size_t total = (size_t) 1e6;
 
     printf("Running %zu `gettimeofday` calls...\n", total);
-    for (unsigned int i = 0; i < total; i++) {
-        gettimeofday(&t[i], NULL);
+    gettimeofday(&start, NULL);
+    for (unsigned int i = 0; i < total - 1; i++) {
+        gettimeofday(&finish, NULL);
     }
 
-    double pace = timeval_pace(&t[0], &t[total-1], total);
+    double pace = timeval_pace(&start, &finish, total);
     printf("%.1f ns per `gettimeofday` call\n", pace);
 }
 
 static void
 measure_clock_gettime_monotonic(void)
 {
-    struct timespec t[(int)1e6];
-    size_t total = sizeof(t) / sizeof(struct timespec);
+    struct timespec start;
+    struct timespec finish;
+    size_t total = (size_t) 1e6;
 
     printf("Running %zu `clock_gettime` calls...\n", total);
-    for (unsigned int i = 0; i < total; i++) {
-        clock_gettime(CLOCK_MONOTONIC, &t[i]);
+    clock_gettime(CLOCK_MONOTONIC, &start);
+    for (unsigned int i = 0; i < total - 1; i++) {
+        clock_gettime(CLOCK_MONOTONIC, &finish);
     }
 
-    double pace = timespec_pace(&t[0], &t[total-1], total);
+    double pace = timespec_pace(&start, &finish, total);
     printf("%.1f ns per `clock_gettime(CLOCK_MONOTONIC)` call\n", pace);
 }
 
 static void
 measure_clock_gettime_monotonic_raw(void)
 {
-    struct timespec t[(int)1e6];
-    size_t total = sizeof(t) / sizeof(struct timespec);
+    struct timespec start;
+    struct timespec finish;
+    size_t total = (size_t) 1e6;
 
     printf("Running %zu `clock_gettime` calls...\n", total);
-    for (unsigned int i = 0; i < total; i++) {
-        clock_gettime(CLOCK_MONOTONIC_RAW, &t[i]);
+    clock_gettime(CLOCK_MONOTONIC_RAW, &start);
+    for (unsigned int i = 0; i < total - 1; i++) {
+        clock_gettime(CLOCK_MONOTONIC_RAW, &finish);
     }
 
-    double pace = timespec_pace(&t[0], &t[total-1], total);
+    double pace = timespec_pace(&start, &finish, total);
     printf("%.1f ns per `clock_gettime(CLOCK_MONOTONIC_RAW)` call\n", pace);
 }
 
 static void
 measure_read_with_gtod(void)
 {
-    size_t total = (size_t)1e6;
+    size_t total = (size_t) 1e6;
 
     unsigned char *buf = malloc(1);
     if (buf == NULL) {
@@ -107,7 +113,7 @@ measure_read_with_gtod(void)
 static void
 measure_read_with_cgt(void)
 {
-    size_t total = (size_t)1e6;
+    size_t total = (size_t) 1e6;
 
     unsigned char *buf = malloc(1);
     if (buf == NULL) {
@@ -133,7 +139,7 @@ measure_read_with_cgt(void)
 static void
 measure_write_with_gtod(void)
 {
-    size_t total = (size_t)1e6;
+    size_t total = (size_t) 1e6;
 
     unsigned char *buf = malloc(1);
     if (buf == NULL) {
@@ -158,7 +164,7 @@ measure_write_with_gtod(void)
 static void
 measure_write_with_cgt(void)
 {
-    size_t total = (size_t)1e6;
+    size_t total = (size_t) 1e6;
 
     unsigned char *buf = malloc(1);
     if (buf == NULL) {
