@@ -121,12 +121,12 @@ cbc_encrypt(unsigned char *in, int in_len,
 
     int no_of_blocks = padded_len / AES_BLOCK_SIZE;
     unsigned char* curr_out = out;
-    unsigned char* curr_in = in;
+    unsigned char* curr_in = padded;
     unsigned char* prev_out = iv;
     unsigned char* xored;
 
     AES_KEY aes_key;
-    AES_set_decrypt_key(key, 128, &aes_key);
+    AES_set_encrypt_key(key, 128, &aes_key);
 
     for (int i = 0; i < no_of_blocks; i++) {
         xored = xor(curr_in, prev_out, AES_BLOCK_SIZE);
@@ -137,6 +137,7 @@ cbc_encrypt(unsigned char *in, int in_len,
         free(xored);
     }
 
+    free(padded);
     return curr_out - out;
 }
 
@@ -153,6 +154,7 @@ cbc_decrypt(unsigned char *in, int in_len,
     unsigned char* curr_in = in;
     unsigned char* prev_in = iv;
     unsigned char* xored;
+    size_t bytes_decrypted = 0;
 
     AES_KEY aes_key;
     AES_set_decrypt_key(key, 128, &aes_key);
@@ -164,10 +166,9 @@ cbc_decrypt(unsigned char *in, int in_len,
         prev_in = curr_in;
         curr_in += AES_BLOCK_SIZE;
         curr_out += AES_BLOCK_SIZE;
+        bytes_decrypted += AES_BLOCK_SIZE;
         free(xored);
     }
-
-    size_t bytes_decrypted = curr_out - out;
 
     ssize_t pad_len = padding_len(out, bytes_decrypted);
     if (pad_len == -1) {
