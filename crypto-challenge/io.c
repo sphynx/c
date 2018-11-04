@@ -40,6 +40,7 @@ get_file_contents(FILE* stream, size_t* len) {
 
     if (fread(buffer, 1, num_bytes, stream) != num_bytes) {
         fprintf(stderr, "fread failed\n");
+        free(buffer);
         return NULL;
     }
 
@@ -89,7 +90,14 @@ read_non_space(FILE* stream) {
                         MAX_BUF_SIZE);
                 return NULL;
             }
-            str = realloc(str, buf_size);
+
+            char* str_new = realloc(str, buf_size);
+            if (str_new == NULL) {
+                free(str);
+                return NULL;
+            } else {
+                str = str_new;
+            }
         }
 
         // append char to the buffer

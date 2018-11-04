@@ -41,6 +41,7 @@ read_hex(char* hex_str, size_t hex_len) {
         uint8_t hi = char_to_four_bits(c1);
         uint8_t lo = char_to_four_bits(c2);
         if (hi == 16 || lo == 16) { // error
+            free(bytes);
             return NULL;
         }
 

@@ -45,7 +45,7 @@ score_step(uint8_t* str, size_t len, int n, size_t start, size_t step) {
     assert(n >= 1 && n <= ALPHABET_SIZE + 1); // +1 for space
 
     // Initialize frequencies table.
-    struct freq freqs[ALPHABET_SIZE];
+    struct freq freqs[ALPHABET_SIZE + 1];
     for (int i = 0; i < ALPHABET_SIZE + 1; i++) {
         struct freq f;
 
