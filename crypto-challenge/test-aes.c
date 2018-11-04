@@ -3,18 +3,12 @@
 #include <stdlib.h>
 
 #include "aes.h"
+#include "random.h"
 
 #define MAX_INPUT_SIZE 1024
 
-void
-init_with_random_bytes(unsigned char *data, size_t data_len)
-{
-    for (unsigned int i = 0; i < data_len; i++) {
-        data[i] = (unsigned char) arc4random();
-    }
-}
-
-void test_encrypt_decrypt(unsigned char *in, size_t in_len)
+static void
+test_encrypt_decrypt(unsigned char *in, size_t in_len)
 {
     unsigned char key[16];
     unsigned char iv[16];
