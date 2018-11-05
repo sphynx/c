@@ -21,11 +21,11 @@ crypto-challenge/challenge7
 crypto-challenge/challenge8
 crypto-challenge/challenge9
 crypto-challenge/challenge10
+crypto-challenge/challenge11
 crypto-challenge/score-tester
 crypto-challenge/xor-encoder
 crypto-challenge/precalculate-pop-count
 crypto-challenge/break-xor
 crypto-challenge/test-padding
 crypto-challenge/test-aes
-crypto-challenge/encryption-oracle
 measure-system-calls/measure

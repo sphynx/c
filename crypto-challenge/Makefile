@@ -8,7 +8,7 @@ vpath %.a $(OPEN_SSL)/lib
 binaries = encode-base64 decode-base64 score-tester xor-encoder \
 	challenge1 challenge2 challenge3 challenge4 challenge5 challenge6 \
 	precalculate-pop-count challenge7 challenge8 challenge9 challenge10 \
-	test-padding test-aes encryption-oracle
+	test-padding test-aes challenge11
 target = $(lastword $(binaries))
 
 all: $(binaries)
@@ -23,6 +23,7 @@ challenge7: -lcrypto base64.o io.o aes.o xor.o hex.o pkcs7-padding.o
 challenge8: hex.o
 challenge9: pkcs7-padding.o
 challenge10: -lcrypto base64.o io.o aes.o xor.o hex.o pkcs7-padding.o
+challenge11: -lcrypto pkcs7-padding.o aes.o xor.o hex.o random.o
 encode-base64: base64.o io.o
 decode-base64: base64.o io.o
 score-tester: hex.o score.o xor.o
@@ -30,9 +31,8 @@ xor-encoder: hex.o io.o xor.o
 precalculate-pop-count: hamming.o
 test-padding: pkcs7-padding.o
 test-aes: -lcrypto pkcs7-padding.o aes.o xor.o hex.o random.o
-encryption-oracle: -lcrypto pkcs7-padding.o aes.o xor.o hex.o random.o
 
-# include depend
+include depend
 
 .PHONY: clean test depend
 
