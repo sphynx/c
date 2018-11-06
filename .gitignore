@@ -11,17 +11,7 @@ zip/my-zip
 zip/my-unzip
 crypto-challenge/encode-base64
 crypto-challenge/decode-base64
-crypto-challenge/challenge1
-crypto-challenge/challenge2
-crypto-challenge/challenge3
-crypto-challenge/challenge4
-crypto-challenge/challenge5
-crypto-challenge/challenge6
-crypto-challenge/challenge7
-crypto-challenge/challenge8
-crypto-challenge/challenge9
-crypto-challenge/challenge10
-crypto-challenge/challenge11
+crypto-challenge/challenge*
 crypto-challenge/score-tester
 crypto-challenge/xor-encoder
 crypto-challenge/precalculate-pop-count
@@ -29,3 +19,4 @@ crypto-challenge/break-xor
 crypto-challenge/test-padding
 crypto-challenge/test-aes
 measure-system-calls/measure
+!*.c
