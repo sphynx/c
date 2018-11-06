@@ -1,0 +1,8 @@
+$ ../challenge12 | sed 's/ *$//g'
+>
+detected block_size = 16, is_ecb = 1
+Rollin' in my 5.0
+With my rag-top down so my hair can blow
+The girlies on standby waving just to say hi
+Did you stop? No, I just drove by
+>= 0

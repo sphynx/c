@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <inttypes.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -59,17 +60,23 @@ detect_block_size(void)
     unsigned char *in;
     unsigned char *out;
 
+    int res = -1;
+
     in = calloc(MAX_BLOCK_SIZE, 1);
     out = calloc(2 * MAX_BLOCK_SIZE + MAX_SECRET_SIZE, 1);
+    if (in == NULL || out == NULL) {
+        goto error;
+    }
 
     prev_out_size = oracle(in, 1, out);
+    if (prev_out_size < 0) {
+        goto error;
+    }
 
     for (size_t i = 2; i <= MAX_BLOCK_SIZE; i++) {
         curr_out_size = oracle(in, i, out);
         if (curr_out_size < 0) {
-            free(in);
-            free(out);
-            return -1;
+            goto error;
         } else {
             if ((size_t) curr_out_size != prev_out_size) {
                 prev_out_size = curr_out_size;
@@ -83,11 +90,14 @@ detect_block_size(void)
         }
     }
 
+    res = first_increase == 0 || second_increase == 0
+        ? -1 : second_increase - first_increase;
+
+error:
     free(in);
     free(out);
 
-    return first_increase == 0 || second_increase == 0
-        ? -1 : second_increase - first_increase;
+    return res;
 }
 
 static int
@@ -96,10 +106,14 @@ detect_ecb(size_t block_size)
     unsigned char *two_blocks = calloc(2 * block_size, 1);
     unsigned char *encrypted = malloc(3 * block_size + MAX_SECRET_SIZE);
 
-    (void) oracle(two_blocks, 2 * block_size, encrypted);
+    int res = -1;
 
-    int res = (0 == memcmp(encrypted, encrypted + block_size, block_size));
+    if (oracle(two_blocks, 2 * block_size, encrypted) < 0)
+        goto error;
 
+    res = (0 == memcmp(encrypted, encrypted + block_size, block_size));
+
+error:
     free(two_blocks);
     free(encrypted);
 
@@ -107,32 +121,42 @@ detect_ecb(size_t block_size)
 }
 
 static int
-decrypt_one_char(size_t block_size)
+decrypt_next_char(size_t block_size, unsigned char* known_chars, size_t known_len)
 {
+    size_t blocks_needed = 1 + known_len / block_size;
+    size_t padding_needed = block_size - 1 - (known_len % block_size);
+    size_t total_size = block_size * blocks_needed;
     int res = -1;
-    unsigned char *in = calloc(block_size, 1);
-    unsigned char *out = malloc(2 * block_size + MAX_SECRET_SIZE);
 
-    // Pass (block_size - 1) zeros, oracle is going to add the first
-    // character to that.
-    (void) oracle(in, block_size - 1, out);
+    unsigned char *in = calloc(block_size, blocks_needed);
+    unsigned char *out = malloc((blocks_needed + 1) * block_size + MAX_SECRET_SIZE);
 
-    // Save the output for later.
+    if (oracle(in, padding_needed, out) < 0) {
+        free(in);
+        free(out);
+        return -1;
+    }
+
+    // Save the last relevant block of output for later comparison.
+    unsigned char *last_relevant_block = out + (blocks_needed - 1) * block_size;
     unsigned char *char_block = malloc(block_size);
-    memcpy(char_block, out, block_size);
+    memcpy(char_block, last_relevant_block, block_size);
 
-    // Now check every byte, passing a full block and checking if we
-    // match saved output. If so, we've found the secret character!
+    // Setup `blocks_needed` of input for checking.
+    memcpy(in + padding_needed, known_chars, known_len);
+
     for (unsigned int i = 0; i < 256; i++) {
-        in[block_size - 1] = (unsigned char) i;
-        (void) oracle(in, block_size, out);
-        if (memcmp(out, char_block, block_size) == 0) {
+        in[total_size - 1] = (unsigned char) i;
+        if (oracle(in, total_size, out) < 0)
+            goto early_exit;
+
+        if (memcmp(last_relevant_block, char_block, block_size) == 0) {
             res = i;
             break;
         }
     }
 
-
+early_exit:
     free(in);
     free(out);
     free(char_block);
@@ -144,17 +168,32 @@ int main(void)
 {
     init_with_random_bytes(key, 16);
 
-    ssize_t block_size = detect_block_size();
-    if (block_size < 0) {
-        fprintf(stderr, "can't detect block_size");
+    ssize_t s_block_size = detect_block_size();
+    if (s_block_size < 0) {
+        fprintf(stderr, "can't detect block_size\n");
         exit(1);
     }
 
-    int is_ecb = detect_ecb((size_t) block_size);
-    int first_char = decrypt_one_char((size_t) block_size);
+    size_t block_size = (size_t) s_block_size;
+    int is_ecb = detect_ecb(block_size);
+    printf("detected block_size = %zu, is_ecb = %d\n", block_size, is_ecb);
 
-    printf("detected block_size = %zd, is_ecb = %d, first_char = %c\n",
-           block_size, is_ecb, (char) first_char);
+    // Decrypt the message byte-by-byte using oracle.
+    size_t i = 0;
+    unsigned char* decrypted = calloc(MAX_SECRET_SIZE, 1);
+    for (;;) {
+        int next_char = decrypt_next_char(block_size, decrypted, i);
+        if (next_char == -1) {
+            break;
+        } else {
+            decrypted[i] = (unsigned char) next_char;
+            i++;
+        }
+    }
+
+    // Write the message.
+    fwrite(decrypted, 1, i - 1, stdout);
+    free(decrypted);
 
     return 0;
 }
