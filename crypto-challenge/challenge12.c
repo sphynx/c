@@ -8,6 +8,7 @@
 #include "random.h"
 
 #define MAX_BLOCK_SIZE 128
+#define MAX_SECRET_SIZE 512
 
 static unsigned char key[16];
 
@@ -59,13 +60,15 @@ detect_block_size(void)
     unsigned char *out;
 
     in = calloc(MAX_BLOCK_SIZE, 1);
-    out = calloc(2 * MAX_BLOCK_SIZE, 1);
+    out = calloc(2 * MAX_BLOCK_SIZE + MAX_SECRET_SIZE, 1);
 
     prev_out_size = oracle(in, 1, out);
 
     for (size_t i = 2; i <= MAX_BLOCK_SIZE; i++) {
         curr_out_size = oracle(in, i, out);
         if (curr_out_size < 0) {
+            free(in);
+            free(out);
             return -1;
         } else {
             if ((size_t) curr_out_size != prev_out_size) {
@@ -91,13 +94,51 @@ static int
 detect_ecb(size_t block_size)
 {
     unsigned char *two_blocks = calloc(2 * block_size, 1);
-    unsigned char *encrypted = malloc(3 * block_size);
+    unsigned char *encrypted = malloc(3 * block_size + MAX_SECRET_SIZE);
 
     (void) oracle(two_blocks, 2 * block_size, encrypted);
 
-    return 0 == memcmp(encrypted, encrypted + block_size, block_size);
+    int res = (0 == memcmp(encrypted, encrypted + block_size, block_size));
+
+    free(two_blocks);
+    free(encrypted);
+
+    return res;
 }
 
+static int
+decrypt_one_char(size_t block_size)
+{
+    int res = -1;
+    unsigned char *in = calloc(block_size, 1);
+    unsigned char *out = malloc(2 * block_size + MAX_SECRET_SIZE);
+
+    // Pass (block_size - 1) zeros, oracle is going to add the first
+    // character to that.
+    (void) oracle(in, block_size - 1, out);
+
+    // Save the output for later.
+    unsigned char *char_block = malloc(block_size);
+    memcpy(char_block, out, block_size);
+
+    // Now check every byte, passing a full block and checking if we
+    // match saved output. If so, we've found the secret character!
+    for (unsigned int i = 0; i < 256; i++) {
+        in[block_size - 1] = (unsigned char) i;
+        (void) oracle(in, block_size, out);
+        if (memcmp(out, char_block, block_size) == 0) {
+            res = i;
+            break;
+        }
+    }
+
+
+    free(in);
+    free(out);
+    free(char_block);
+
+    return res;
+}
 
 int main(void)
 {
@@ -110,9 +151,10 @@ int main(void)
     }
 
     int is_ecb = detect_ecb((size_t) block_size);
+    int first_char = decrypt_one_char((size_t) block_size);
 
-    printf("detected block_size = %zd, is_ecb = %d\n",
-           block_size, is_ecb);
+    printf("detected block_size = %zd, is_ecb = %d, first_char = %c\n",
+           block_size, is_ecb, (char) first_char);
 
     return 0;
 }
