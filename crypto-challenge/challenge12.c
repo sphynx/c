@@ -87,12 +87,32 @@ detect_block_size(void)
         ? -1 : second_increase - first_increase;
 }
 
+static int
+detect_ecb(size_t block_size)
+{
+    unsigned char *two_blocks = calloc(2 * block_size, 1);
+    unsigned char *encrypted = malloc(3 * block_size);
+
+    (void) oracle(two_blocks, 2 * block_size, encrypted);
+
+    return 0 == memcmp(encrypted, encrypted + block_size, block_size);
+}
+
 
 int main(void)
 {
     init_with_random_bytes(key, 16);
 
-    printf("detected block_size = %zd\n", detect_block_size());
+    ssize_t block_size = detect_block_size();
+    if (block_size < 0) {
+        fprintf(stderr, "can't detect block_size");
+        exit(1);
+    }
+
+    int is_ecb = detect_ecb((size_t) block_size);
+
+    printf("detected block_size = %zd, is_ecb = %d\n",
+           block_size, is_ecb);
 
     return 0;
 }
