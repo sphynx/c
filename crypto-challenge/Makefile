@@ -24,7 +24,7 @@ challenge8: hex.o
 challenge9: pkcs7-padding.o
 challenge10: -lcrypto base64.o io.o aes.o xor.o hex.o pkcs7-padding.o
 challenge11: -lcrypto pkcs7-padding.o aes.o xor.o hex.o random.o
-challenge12: -lcrypto pkcs7-padding.o aes.o xor.o hex.o random.o
+challenge12: -lcrypto pkcs7-padding.o aes.o xor.o hex.o random.o base64.o
 encode-base64: base64.o io.o
 decode-base64: base64.o io.o
 score-tester: hex.o score.o xor.o

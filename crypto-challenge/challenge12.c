@@ -7,7 +7,7 @@
 #include "base64.h"
 #include "random.h"
 
-enum mode { CBC, ECB };
+#define MAX_BLOCK_SIZE 128
 
 static unsigned char key[16];
 
@@ -46,10 +46,53 @@ oracle(unsigned char *in, size_t in_len, unsigned char *out)
     return encrypted_len;
 }
 
+static ssize_t
+detect_block_size(void)
+{
+    size_t first_increase = 0;
+    size_t second_increase = 0;
+
+    size_t prev_out_size;
+    size_t curr_out_size;
+
+    unsigned char *in;
+    unsigned char *out;
+
+    in = calloc(MAX_BLOCK_SIZE, 1);
+    out = calloc(2 * MAX_BLOCK_SIZE, 1);
+
+    prev_out_size = oracle(in, 1, out);
+
+    for (size_t i = 2; i <= MAX_BLOCK_SIZE; i++) {
+        curr_out_size = oracle(in, i, out);
+        if (curr_out_size < 0) {
+            return -1;
+        } else {
+            if ((size_t) curr_out_size != prev_out_size) {
+                prev_out_size = curr_out_size;
+                if (first_increase == 0) {
+                    first_increase = i;
+                } else {
+                    second_increase = i;
+                    break;
+                }
+            }
+        }
+    }
+
+    free(in);
+    free(out);
+
+    return first_increase == 0 || second_increase == 0
+        ? -1 : second_increase - first_increase;
+}
+
 
 int main(void)
 {
     init_with_random_bytes(key, 16);
+
+    printf("detected block_size = %zd\n", detect_block_size());
 
     return 0;
 }
