@@ -110,7 +110,7 @@ measure_read_with_gtod(void)
            pace);
 }
 
-static void
+static double
 measure_read_with_cgt(void)
 {
     size_t total = (size_t) 1e6;
@@ -133,6 +133,7 @@ measure_read_with_cgt(void)
     double pace = timespec_pace(&start, &stop, total);
     printf("%.1f ns per `read` call (measured with CLOCK_MONOTONIC_RAW)\n",
            pace);
+    return pace;
 }
 
 
@@ -161,7 +162,7 @@ measure_write_with_gtod(void)
            pace);
 }
 
-static void
+static double
 measure_write_with_cgt(void)
 {
     size_t total = (size_t) 1e6;
@@ -183,8 +184,66 @@ measure_write_with_cgt(void)
 
     double pace = timespec_pace(&start, &stop, total);
     printf("%.1f ns per `write` call (measured with CLOCK_MONOTONIC_RAW)\n", pace);
+    return pace;
 }
 
+
+static void
+measure_context_switch(double avg_read_time, double avg_write_time)
+{
+    size_t total = (size_t) 5e5;
+
+    // Create two pipes.
+    int pipe1_fds[2];
+    int pipe2_fds[2];
+
+    if (pipe(pipe1_fds) == -1) {
+        perror("pipe");
+        exit(1);
+    }
+    if (pipe(pipe2_fds) == -1) {
+        perror("pipe");
+        exit(1);
+    }
+
+    printf("Running %zu context switches...\n", total * 2);
+
+    int rc = fork();
+
+    if (rc < 0) {
+        perror("fork");
+        exit(1);
+    } else if (rc == 0) {
+        // child
+        unsigned char out_buf[] = {1};
+        unsigned char in_buf[1];
+
+        for (size_t i = 0; i < total; i++) {
+            read(pipe2_fds[0], in_buf, 1);
+            write(pipe1_fds[1], out_buf, 1);
+        }
+    } else {
+        // parent
+        unsigned char out_buf[] = {1};
+        unsigned char in_buf[1];
+
+        struct timespec start;
+        struct timespec stop;
+        clock_gettime(CLOCK_MONOTONIC_RAW, &start);
+
+        for (size_t i = 0; i < total; i++) {
+            write(pipe2_fds[1], out_buf, 1);
+            read(pipe1_fds[0], in_buf, 1);
+        }
+
+        clock_gettime(CLOCK_MONOTONIC_RAW, &stop);
+        double pace = timespec_pace(&start, &stop, 2*total);
+        printf("%.1f ns per context switch (including two sytem calls: read and write)\n", pace);
+        printf("%.1f ns per context switch only\n",
+               pace - avg_read_time - avg_write_time);
+
+    }
+}
 
 int main(void)
 {
@@ -192,8 +251,9 @@ int main(void)
     measure_clock_gettime_monotonic();
     measure_clock_gettime_monotonic_raw();
     measure_read_with_gtod();
-    measure_read_with_cgt();
+    double read_time = measure_read_with_cgt();
     measure_write_with_gtod();
-    measure_write_with_cgt();
+    double write_time = measure_write_with_cgt();
+    measure_context_switch(read_time, write_time);
     return 0;
 }
