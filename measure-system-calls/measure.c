@@ -189,7 +189,7 @@ measure_write_with_cgt(void)
 
 
 static void
-measure_context_switch(double avg_read_time, double avg_write_time)
+measure_context_switch()
 {
     size_t total = (size_t) 5e5;
 
@@ -206,10 +206,34 @@ measure_context_switch(double avg_read_time, double avg_write_time)
         exit(1);
     }
 
-    printf("Running %zu context switches...\n", total * 2);
+    // First, estimate the cost of passing the token through pipes in
+    // just one process.
+
+    printf("Running %zu token passing in one process...\n", 2 * total);
+    unsigned char out_buf[] = {1};
+    unsigned char in_buf[1];
+
+    struct timespec start_1proc;
+    struct timespec stop_1proc;
+
+    clock_gettime(CLOCK_MONOTONIC_RAW, &start_1proc);
+
+    for (size_t i = 0; i < total; i++) {
+        write(pipe1_fds[1], out_buf, 1);
+        read(pipe1_fds[0], in_buf, 1);
+        write(pipe2_fds[1], out_buf, 1);
+        read(pipe2_fds[0], in_buf, 1);
+    }
+
+    clock_gettime(CLOCK_MONOTONIC_RAW, &stop_1proc);
+    double token_passing_cost = timespec_pace(&start_1proc, &stop_1proc, 2 * total);
+    printf("%.1f ns - token passing cost (per one context switch) \n",
+           token_passing_cost);
+
+    // Now fork and run token passing with two processes.
+    printf("Running %zu context switches...\n", 2 * total);
 
     int rc = fork();
-
     if (rc < 0) {
         perror("fork");
         exit(1);
@@ -229,6 +253,7 @@ measure_context_switch(double avg_read_time, double avg_write_time)
 
         struct timespec start;
         struct timespec stop;
+
         clock_gettime(CLOCK_MONOTONIC_RAW, &start);
 
         for (size_t i = 0; i < total; i++) {
@@ -237,11 +262,10 @@ measure_context_switch(double avg_read_time, double avg_write_time)
         }
 
         clock_gettime(CLOCK_MONOTONIC_RAW, &stop);
-        double pace = timespec_pace(&start, &stop, 2*total);
-        printf("%.1f ns per context switch (including two sytem calls: read and write)\n", pace);
-        printf("%.1f ns per context switch only\n",
-               pace - avg_read_time - avg_write_time);
 
+        double pace = timespec_pace(&start, &stop, 2 * total);
+        printf("%.1f ns per context switch (including token passing cost through pipes)\n", pace);
+        printf("%.1f ns per context switch only\n", pace - token_passing_cost);
     }
 }
 
@@ -251,9 +275,10 @@ int main(void)
     measure_clock_gettime_monotonic();
     measure_clock_gettime_monotonic_raw();
     measure_read_with_gtod();
-    double read_time = measure_read_with_cgt();
+    measure_read_with_cgt();
     measure_write_with_gtod();
-    double write_time = measure_write_with_cgt();
-    measure_context_switch(read_time, write_time);
+    measure_write_with_cgt();
+    measure_context_switch();
+
     return 0;
 }
