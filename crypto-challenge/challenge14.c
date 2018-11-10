@@ -9,7 +9,7 @@
 #include "random.h"
 
 #define MAX_BLOCK_SIZE 128
-#define MAX_PREFIX_SIZE 64
+#define MAX_PREFIX_SIZE 256
 #define MAX_SECRET_SIZE 512
 
 static unsigned char key[16];
@@ -107,27 +107,6 @@ error:
     return res;
 }
 
-static int
-detect_ecb(size_t block_size)
-{
-    unsigned char *two_blocks = calloc(2 * block_size, 1);
-    unsigned char *encrypted = malloc(3 * block_size + MAX_SECRET_SIZE);
-
-    int res = -1;
-
-    if (oracle(two_blocks, 2 * block_size, encrypted) < 0)
-        goto error;
-
-    res = (0 == memcmp(encrypted, encrypted + block_size, block_size));
-
-error:
-    free(two_blocks);
-    free(encrypted);
-
-    return res;
-}
-
-
 static ssize_t
 detect_total_len(size_t block_size)
 {
@@ -207,6 +186,52 @@ early_exit:
     return res;
 }
 
+static int
+decrypt_next_char(size_t block_size, size_t prefix_len,
+                  unsigned char* known_chars, size_t known_len)
+{
+    size_t blocks_needed = 1 + (known_len + prefix_len) / block_size;
+    // size_t padding_needed = block_size - 1 - (known_len % block_size);
+    size_t total_size = block_size * blocks_needed;
+    size_t padding_needed = total_size - prefix_len - known_len - 1;
+    int res = -1;
+
+    unsigned char *in = calloc(block_size, blocks_needed);
+    unsigned char *out = malloc(total_size + block_size + MAX_SECRET_SIZE);
+
+    unsigned char *char_block = NULL;
+
+    if (oracle(in, padding_needed, out) < 0)
+        goto early_exit;
+
+    // Save the last relevant block of output for later comparison.
+    unsigned char *last_relevant_block = out + (blocks_needed - 1) * block_size;
+    char_block = malloc(block_size);
+    memcpy(char_block, last_relevant_block, block_size);
+
+    // Copy known_chars to the input for checking.
+    memcpy(in + padding_needed, known_chars, known_len);
+
+    for (unsigned int i = 0; i < 256; i++) {
+        in[total_size - prefix_len - 1] = (unsigned char) i;
+        if (oracle(in, total_size - prefix_len, out) < 0)
+            goto early_exit;
+
+        if (memcmp(last_relevant_block, char_block, block_size) == 0) {
+            res = i;
+            break;
+        }
+    }
+
+early_exit:
+    free(in);
+    free(out);
+    free(char_block);
+
+    return res;
+}
+
+
 int main(void)
 {
     init_with_random_bytes(key, 16);
@@ -218,13 +243,43 @@ int main(void)
     init_with_random_bytes(prefix, prefix_len);
 
     ssize_t block_size = detect_block_size();
-    int is_ecb = detect_ecb(block_size);
-    ssize_t total_len = detect_total_len((size_t) block_size);
-    ssize_t guessed_prefix_len = detect_prefix_len((size_t) block_size);
-    ssize_t secret_len = total_len - guessed_prefix_len;
+    if (block_size == -1) {
+        printf("can't determine block_size\n");
+        exit(1);
+    }
 
-    printf("block_size=%zd, is_ecb=%d, total_len=%zd, prefix_len=%zd, "
+    ssize_t total_len = detect_total_len((size_t) block_size);
+    if (total_len == -1) {
+        printf("can't determine total_len\n");
+        exit(1);
+    }
+
+    ssize_t guessed_prefix_len = detect_prefix_len((size_t) block_size);
+    if (guessed_prefix_len == -1) {
+        printf("can't determine prefix_len\n");
+        exit(1);
+    }
+
+    ssize_t secret_len = total_len - guessed_prefix_len;
+    assert(secret_len >= 0);
+
+    printf("block_size=%zd, total_len=%zd, prefix_len=%zd, "
            "guessed_prefix_len=%zd, secret_len=%zd\n",
-           block_size, is_ecb, total_len, prefix_len,
+           block_size, total_len, prefix_len,
            guessed_prefix_len, secret_len);
+
+    // Decrypt the message byte-by-byte using oracle.
+    unsigned char* secret = calloc(MAX_SECRET_SIZE, 1);
+    for (size_t i = 0; i < (size_t) secret_len; i++) {
+        int next_char = decrypt_next_char(block_size, guessed_prefix_len, secret, i);
+        if (next_char < 0) {
+            printf("can't decrypt next char\n");
+            exit(1);
+        }
+        secret[i] = (unsigned char) next_char;
+    }
+
+    // Write the message.
+    fwrite(secret, 1, secret_len, stdout);
+    free(secret);
 }
