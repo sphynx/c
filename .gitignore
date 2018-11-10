@@ -18,5 +18,6 @@ crypto-challenge/precalculate-pop-count
 crypto-challenge/break-xor
 crypto-challenge/test-padding
 crypto-challenge/test-aes
+crypto-challenge/depend
 measure-system-calls/measure
 !*.c
