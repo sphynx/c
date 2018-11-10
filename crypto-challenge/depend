@@ -133,6 +133,7 @@ challenge14.o: challenge14.c aes.h \
   /usr/local/opt/openssl-debug/include/openssl/bnerr.h \
   /usr/local/opt/openssl-debug/include/openssl/objectserr.h base64.h \
   random.h
+challenge15.o: challenge15.c pkcs7-padding.h
 challenge2.o: challenge2.c xor.h
 challenge3.o: challenge3.c score.h hex.h xor.h
 challenge4.o: challenge4.c score.h
