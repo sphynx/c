@@ -172,7 +172,6 @@ cbc_decrypt(unsigned char *in, int in_len,
 
     ssize_t pad_len = padding_len(out, bytes_decrypted);
     if (pad_len == -1) {
-        fprintf(stderr, "padding_len failed\n");
         return -1;
     }
 

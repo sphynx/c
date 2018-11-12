@@ -1,0 +1,73 @@
+========================================================================
+== Challenge 16 notes
+==
+
+0123456789abcdef  0123456789abcdef  0123456789abcdef  0123456789abcdef  0123456789abcdef  0123456789abcdef
+comment1=cooking  %20MCs;userdata=  ;admin=true;comm  ent2=%20like%20a  %20pound%20of%20  bacon
+
+... 0a (random 13 bytes) || 03 03 03 <- last block
+
+We can change the cyphertext and therefore change the decrypted
+plaintext in the next block, then we have to use information given to
+us by padding errors.
+
+03 03 03 is fine, but say 02 03 03 isn't, there should be three bytes with three...
+
+this way we can probably figure out the length of the message, but we
+know it anyway...
+
+ok, how we can figure out the length?
+
+maybe it will help..
+
+We have CT, we determine number of blocks (given by decr_len / 16), we
+know that the last byte should be between 0x01 and 0x10
+
+bits
+54321
+-----
+00001
+10000
+
+So, if we flip, say, 6-th least significant bit (or any other
+basically) in the second last byte, it would would definitely lead to
+padding error, this is not interesting.
+
+But if we flip 6th ls bit in the penultimate byte it won't give us
+error when the padding size is 1.
+
+Thus the algorithm to determine the padding length is as follows:
+
+for i = 1 .. 15:
+    flip 6th bit in (last - i)-th byte of the last block
+    try to decode that
+    if we see an error during decoding
+        then continue
+        else return that padding is i
+
+If we see errors on everything then padding is 16 (i.e. no padding).
+
+OK, in this way we can determine the padding len and thus the message
+size: num_blocks * 16 - padding_size
+
+Now, when we know the length, we can just generate a block with lots
+of padding (i.e. say 16 bytes of it) and then we can just append
+';admin=true;' and fix the padding by manipulating the penultimate
+block.
+
+i.e. we known that we can have the last block just full of padding:
+
+  0x10 0x10 ... (16 times)
+
+and we want to have:
+
+  ';' 'a' 'd' 'm' 'i' 'n' '=' 't' 'r' 'u' 'e' ';' 0x4 0x4 0x4 0x4
+
+So we just xor those two strings to get a "patch", and then xor the
+result with the pen-ultimate block of the cyphertext, i.e. apply that
+"patch" to the cyphertext. Then the same patch would be applied to the
+decoded cyphertext and we will get our string. Of course pen-ultimate
+decoded block would be broken, but we don't care about that, since we
+only care if the result contains ';admin=true;' substring.
+
+========================================================================
