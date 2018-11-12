@@ -1,0 +1,2 @@
+$ ../challenge16 | grep -q 'admin access granted'
+>= 0
