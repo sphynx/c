@@ -44,12 +44,12 @@ padding_len(uint8_t* padded_data, size_t data_len)
     assert(padded_data);
 
     if (data_len < 1) {
-        return 0;
+        return -1;
     }
 
     uint8_t n = padded_data[data_len - 1];
 
-    if (n > data_len) {
+    if (n > data_len || n == 0) {
         return -1;
     }
 
