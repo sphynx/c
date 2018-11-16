@@ -71,3 +71,98 @@ decoded block would be broken, but we don't care about that, since we
 only care if the result contains ';admin=true;' substring.
 
 ========================================================================
+== Challenge 17 notes
+==
+
+We are using observation here that we can modify the last byte of
+penultimate block in the cyphertext and then the corresponding byte in
+the decoded text will have the same change applied. Most likely that
+will be a padding error, unless it is 0x01 which is good padding on
+its own. There is also a slim chance that 0x02 will be good, in the
+case if we had 0x02 0x01 end in the original padded plaintext. But
+it's probability is 1/65536 (and even smaller for 0x03 0x03 0x03 end),
+so we ignore it for now.
+
+So our goal is to iteratively xor that byte in question with 1 .. 255
+and when there is no error this means that we found the plaintext
+correct byte.
+
+In order to look at interesting characters we need to truncate the
+original padding first.
+
+Example:
+
+Original (we are encoding 26 chars):
+0123456789abcdef 0123456789abcdef
+abcdefghijklmnop qrstuvwxyz
+
+Padded (6 bytes padding):
+0123456789abcdef 0123456789abcdef
+abcdefghijklmnop qrstuvwxyz666666
+
+Encoded (some unprintable gibberish):
+0123456789abcdef 0123456789abcdef
+.........d...=.. ...1.(..[.......
+
+We know how to determine the length of real message (see challenge
+16), i.e. amount of padding added. In this case we can learn that it's
+6.
+
+Let's first look into the simpler case when plaintext is a multiple of
+blocksize. Then the last block is all padding and it's all 0x10 (we
+mark that value with *):
+
+0123456789abcdef 0123456789abcdef 0123456789abcdef
+.........d...=.. ...1.(..[....... ...7.%..[.A.x3..
+
+Now, if we decrypt we get:
+
+0123456789abcdef 0123456789abcdef 0123456789abcdef
+abcdefghijklmnop zzzzzzzzzzzzzzzz ****************
+
+We want to decrypt the last character of the plaintext, let's call it
+x.
+
+Let's call the last byte of the first block of the CT: ct_1_last.
+Let's call the last byte of the second block of the CT: ct_2_last.
+Let's call the last byte of the second block of the PT: pt_2_last.
+
+Now let's modify ct_1_last, xoring it with say 1, we then also
+truncate the padding block (just passing two blocks for decryption)
+and check padding,
+
+we'll get (pt_2_last ^ 1) in the last position (which is most likely
+not the right thing for padding), so we'll probably get a padding
+error.
+
+But eventually, when we get to something which xored with pt_2_last
+gives 1 we will be fine (no error). This "something" is (pt_2_last ^
+1), because:
+
+  pt_2_last ^ (pt_2_last ^ 1) = 1
+
+Let's call it `patch`:
+
+  patch = pt_2_last ^ 1
+
+Then, from here we have:
+
+  pt_2_last = patch ^ 1
+
+Now we want to decrypt the previous byte. In order to do so, we tamper
+the last byte of the ciphertext, so that the last byte of decrypted is
+0x02. And we xor the second to last byte with 0 .. 255 until we have
+no error (which means that the result is 0x02). We call this patch_2.
+Then:
+
+  p2_2_second_last = patch_2 ^ 2
+
+And so on, we can proceed like this for the whole block of 16 bytes.
+
+If we want to decrypt the very first block, we have to do the same
+manipulation on IV.
+
+It's also interesting on the last block, we have do it with a special
+treatment. First, we determine the size of the real padding. Then we
+write this real padding into plaintext and go with padding from
+byte-guessing starting from position right before the padding.
