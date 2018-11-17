@@ -4,39 +4,7 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
-struct node {
-    char *arg;
-    struct node *next;
-};
-
-size_t
-list_len(struct node *curr)
-{
-    size_t s = 0;
-    while (curr != NULL) {
-        curr = curr->next;
-        s++;
-    }
-    return s;
-}
-
-void
-add_arg(struct node **head, char* arg)
-{
-    struct node *new = malloc(sizeof(struct node));
-    new->arg = arg;
-    new->next = NULL;
-
-    if (*head == NULL) {
-        *head = new;
-    } else {
-        struct node *curr = *head;
-        while (curr->next)
-            curr = curr->next;
-
-        curr->next = new;
-    }
-}
+#include "list.h"
 
 static void
 err(void)
@@ -75,7 +43,7 @@ int main(void)
                 err();
             } else if (rc == 0) {
                 // Prepare arguments array.
-                size_t args_no = list_len(args_list);
+                size_t args_no = length(args_list);
                 char **args = calloc(args_no + 2, sizeof(char *));
 
                 args[0] = cmd;
@@ -89,6 +57,8 @@ int main(void)
                 if (execv(args[0], args) == -1) {
                     err();
                 }
+
+                free(args);
             } else {
                 // Parent.
                 if (wait(NULL) == -1) {
@@ -96,6 +66,9 @@ int main(void)
                 }
             }
         }
+
+        free_list(args_list);
+
         printf("wish> ");
     }
 
