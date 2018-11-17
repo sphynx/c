@@ -42,7 +42,7 @@ test-aes: -lcrypto pkcs7-padding.o aes.o endian.o xor.o hex.o random.o
 
 include depend
 
-.PHONY: clean test depend
+.PHONY: clean test depend run check
 
 clean:
 	$(RM) -r -f $(binaries) *.o *.gch *.dSYM
@@ -64,3 +64,6 @@ depend: *.c
 
 run: $(target)
 	./$(target)
+
+check:
+	cppcheck *.c
