@@ -78,11 +78,20 @@ cbc_decrypt(unsigned char *in,
 
 
 /*
- * Decrypts AES-encoded data in CTR mode using low-level OpenSSL
- * interface. Takes a byte string in, its length, the key and the
- * nonce. Writes to out (its length should be the same as the length
- * of in). Returns 0 if failed, 1 if everything is good.
+ * Encrypts/decrypts AES-encoded data in CTR mode using low-level
+ * OpenSSL interface. Takes a byte string in, its length, the key and
+ * the nonce. Writes to out (its length should be the same as the
+ * length of in). Returns 0 if failed, 1 if everything is good.
+ * Encryption and decryption are identical. No padding is made because
+ * it's not needed.
  */
+int
+ctr_encrypt(unsigned char *in,
+            int in_len,
+            unsigned char *key,
+            uint64_t nonce,
+            unsigned char *out);
+
 int
 ctr_decrypt(unsigned char *in,
             int in_len,

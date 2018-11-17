@@ -157,5 +157,7 @@ main(void)
         printf("no admin access\n");
     }
 
+    free(buf);
+
     return 0;
 }

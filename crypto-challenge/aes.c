@@ -216,6 +216,7 @@ ctr_decrypt(unsigned char *in,
             counter_bytes = bytes_le_order(counter++);
             memcpy(ctr_in_block + 8, counter_bytes, 8);
             AES_encrypt(ctr_in_block, ctr_out_block, &aes_key);
+            free(counter_bytes);
         }
         out[i] = in[i] ^ ctr_out_block[i % 16];
     }
@@ -226,3 +227,13 @@ ctr_decrypt(unsigned char *in,
     return 1;
 }
 
+
+int
+ctr_encrypt(unsigned char *in,
+            int in_len,
+            unsigned char *key,
+            uint64_t nonce,
+            unsigned char *out)
+{
+    return ctr_decrypt(in, in_len, key_nonce, out);
+}
