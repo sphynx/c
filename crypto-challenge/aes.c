@@ -1,4 +1,5 @@
 #include <assert.h>
+#include <inttypes.h>
 #include <string.h>
 
 #include <openssl/conf.h>
@@ -6,6 +7,7 @@
 #include <openssl/aes.h>
 
 #include "aes.h"
+#include "endian.h"
 #include "xor.h"
 #include "pkcs7-padding.h"
 
@@ -177,3 +179,50 @@ cbc_decrypt(unsigned char *in, int in_len,
 
     return bytes_decrypted - (size_t) pad_len;
 }
+
+int
+ctr_decrypt(unsigned char *in,
+            int in_len,
+            unsigned char *key,
+            uint64_t nonce,
+            unsigned char *out)
+{
+    // Sey up AES key.
+    AES_KEY aes_key;
+    AES_set_encrypt_key(key, 128, &aes_key);
+
+    // Prepare starting in block. First goes nonce, little endian,
+    // then goes the counter.
+    unsigned char *ctr_in_block = malloc(16);
+    if (ctr_in_block == NULL) {
+        return 0;
+    }
+
+    uint8_t *nonce_bytes = bytes_le_order(nonce);
+    memcpy(ctr_in_block, nonce_bytes, 8);
+
+    uint64_t counter = 0;
+    unsigned char *counter_bytes;
+
+    unsigned char *ctr_out_block = malloc(16);
+    if (ctr_out_block == NULL) {
+        free(ctr_in_block);
+        return 0;
+    }
+
+    for (int i = 0; i < in_len; i++) {
+        if (i % 16 == 0) {
+            // Encrypt a new counter block.
+            counter_bytes = bytes_le_order(counter++);
+            memcpy(ctr_in_block + 8, counter_bytes, 8);
+            AES_encrypt(ctr_in_block, ctr_out_block, &aes_key);
+        }
+        out[i] = in[i] ^ ctr_out_block[i % 16];
+    }
+
+    free(ctr_in_block);
+    free(ctr_out_block);
+
+    return 1;
+}
+

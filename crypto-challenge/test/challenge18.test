@@ -1,0 +1,3 @@
+$ ../challenge18 | grep -o Ice | wc -l | sed 's/ //g'
+>
+4

@@ -9,7 +9,7 @@ binaries = encode-base64 decode-base64 score-tester xor-encoder \
 	challenge1 challenge2 challenge3 challenge4 challenge5 challenge6 \
 	precalculate-pop-count challenge7 challenge8 challenge9 challenge10 \
 	test-padding test-aes challenge11 challenge12 challenge13 challenge14 \
-	challenge15 challenge16 challenge17
+	challenge15 challenge16 challenge17 challenge18
 target = $(lastword $(binaries))
 
 all: $(binaries)
@@ -20,24 +20,25 @@ challenge3: hex.o score.o xor.o
 challenge4: hex.o score.o xor.o
 challenge5: hex.o score.o xor.o
 challenge6: base64.o hamming.o hex.o io.o score.o xor.o
-challenge7: -lcrypto base64.o io.o aes.o xor.o hex.o pkcs7-padding.o
+challenge7: -lcrypto base64.o io.o aes.o endian.o xor.o hex.o pkcs7-padding.o
 challenge8: hex.o
 challenge9: pkcs7-padding.o
-challenge10: -lcrypto base64.o io.o aes.o xor.o hex.o pkcs7-padding.o
-challenge11: -lcrypto pkcs7-padding.o aes.o xor.o hex.o random.o
-challenge12: -lcrypto pkcs7-padding.o aes.o xor.o hex.o random.o base64.o
-challenge13: -lcrypto pkcs7-padding.o aes.o xor.o hex.o random.o
-challenge14: -lcrypto pkcs7-padding.o aes.o xor.o hex.o random.o base64.o
+challenge10: -lcrypto base64.o io.o aes.o endian.o xor.o hex.o pkcs7-padding.o
+challenge11: -lcrypto pkcs7-padding.o aes.o endian.o xor.o hex.o random.o
+challenge12: -lcrypto pkcs7-padding.o aes.o endian.o xor.o hex.o random.o base64.o
+challenge13: -lcrypto pkcs7-padding.o aes.o endian.o xor.o hex.o random.o
+challenge14: -lcrypto pkcs7-padding.o aes.o endian.o xor.o hex.o random.o base64.o
 challenge15: pkcs7-padding.o
-challenge16: -lcrypto pkcs7-padding.o aes.o xor.o hex.o random.o base64.o
-challenge17: -lcrypto pkcs7-padding.o aes.o xor.o hex.o random.o base64.o
+challenge16: -lcrypto pkcs7-padding.o aes.o endian.o xor.o hex.o random.o base64.o
+challenge17: -lcrypto pkcs7-padding.o aes.o endian.o xor.o hex.o random.o base64.o
+challenge18: -lcrypto pkcs7-padding.o aes.o endian.o xor.o hex.o random.o base64.o
 encode-base64: base64.o io.o
 decode-base64: base64.o io.o
 score-tester: hex.o score.o xor.o
 xor-encoder: hex.o io.o xor.o
 precalculate-pop-count: hamming.o
 test-padding: pkcs7-padding.o
-test-aes: -lcrypto pkcs7-padding.o aes.o xor.o hex.o random.o
+test-aes: -lcrypto pkcs7-padding.o aes.o endian.o xor.o hex.o random.o
 
 include depend
 
