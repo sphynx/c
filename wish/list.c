@@ -14,10 +14,10 @@ length(struct node *curr)
 }
 
 void
-add_arg(struct node **head, char* arg)
+add_elem(struct node **head, char* elem)
 {
     struct node *new = malloc(sizeof(struct node));
-    new->arg = arg;
+    new->val = elem;
     new->next = NULL;
 
     if (*head == NULL) {
