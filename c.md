@@ -25,6 +25,9 @@ read-only data-segment and therefore will be accessible to all
 functions even after the function containing that declaration will
 return, so it is more or less safe to return a pointer `str`.
 
+Details:
+https://stackoverflow.com/questions/2589949/string-literals-where-do-they-go
+
 However, if you want to make sure it's safe to return, we can use
 something like
 
