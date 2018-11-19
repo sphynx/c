@@ -31,23 +31,20 @@ set_path(char **args)
         add_elem(&path, *args++);
 }
 
-static char*
-find_in_path(char *cmd)
+static char
+*find_in_path(char *cmd)
 {
-    struct node *curr = path;
+    struct node *curr;
     char *res = NULL;
-    while (curr != NULL) {
+
+    for (curr = path; curr != NULL; curr = curr->next) {
         size_t total_len = strlen(curr->val) + strlen(cmd) + 2;
-        char *str = calloc(1, total_len);
-        memcpy(str, curr->val, strlen(curr->val));
-        memcpy(str + strlen(curr->val), "/", 1);
-        memcpy(str + strlen(curr->val) + 1, cmd, strlen(cmd));
+        char *str = calloc(total_len, 1);
+        snprintf(str, total_len, "%s/%s", curr->val, cmd);
         if (access(str, X_OK) == 0) {
             res = str;
             break;
         }
-
-        curr = curr->next;
     }
 
     return res;
@@ -92,17 +89,17 @@ int main(void)
             exit(0);
         } else if (strcmp(cmd, "path") == 0) {
             printf("setting new path...\n");
-            set_path(&args[1]); // skip path cmd
+            set_path(&args[1]); // skip path cmd from args[0]
         } else {
             pid_t rc = fork();
             if (rc < 0) {
                 err();
             } else if (rc == 0) {
-                char* resolved = find_in_path(args[0]);
+                char* resolved = find_in_path(cmd);
                 if (resolved == NULL) {
-                    printf("not found in path\n");
+                    printf("%s is not found in PATH\n", cmd);
                 } else {
-                    printf("resolved to: %s\n", resolved);
+                    printf("resolved with PATH to: %s\n", resolved);
                     args[0] = resolved;
                     if (execv(args[0], args) == -1) {
                         err();
