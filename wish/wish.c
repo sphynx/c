@@ -6,13 +6,16 @@
 
 #include "list.h"
 
+#define PROMPT "wish> "
+
 static struct node *path;
 
 static void
-err(void)
+err(char *msg)
 {
-    char error_message[30] = "An error has occurred\n";
-    write(STDERR_FILENO, error_message, strlen(error_message));
+    // char error_message[30] = "An error has occurred\n";
+    // write(STDERR_FILENO, error_message, strlen(error_message));
+    fprintf(stderr, "error: %s\n", msg);
 }
 
 static void
@@ -27,27 +30,29 @@ set_path(char **args)
     // Overwrite existing path.
     free_list(path);
     path = NULL;
-    while (*args)
-        add_elem(&path, *args++);
+    while (*args) {
+        // `strdup` is essential here, otherwise path entries will be
+        // overwritten or freed later.
+        add_elem(&path, strdup(*args++));
+    }
 }
 
 static char
 *find_in_path(char *cmd)
 {
     struct node *curr;
-    char *res = NULL;
-
     for (curr = path; curr != NULL; curr = curr->next) {
         size_t total_len = strlen(curr->val) + strlen(cmd) + 2;
         char *str = calloc(total_len, 1);
         snprintf(str, total_len, "%s/%s", curr->val, cmd);
-        if (access(str, X_OK) == 0) {
-            res = str;
-            break;
-        }
+
+        if (access(str, X_OK) == 0)
+            return str;
+
+        free(str);
     }
 
-    return res;
+    return NULL;
 }
 
 int main(void)
@@ -55,13 +60,12 @@ int main(void)
     char *line = NULL;
     size_t cap = 0;
     ssize_t line_len;
-    char *sep = " \t\n";
-
+    const char *sep = " \t\n";
     char *cmd;
 
     init_path();
 
-    printf("wish> ");
+    printf(PROMPT);
     while ((line_len = getline(&line, &cap, stdin)) > 0) {
         struct node *args_list = NULL;
         char *arg_token;
@@ -81,44 +85,47 @@ int main(void)
             curr = curr->next;
         }
         args[args_no + 1] = NULL;
+        free_list(args_list);
 
         if (cmd == NULL) {
+
             // do nothing
+
         } else if (strcmp(cmd, "exit") == 0) {
-            printf("exiting...\n");
-            exit(0);
+
+            exit(EXIT_SUCCESS);
+
         } else if (strcmp(cmd, "path") == 0) {
-            printf("setting new path...\n");
+
             set_path(&args[1]); // skip path cmd from args[0]
+
         } else {
+
             pid_t rc = fork();
             if (rc < 0) {
-                err();
+                err("fork failed");
             } else if (rc == 0) {
                 char* resolved = find_in_path(cmd);
                 if (resolved == NULL) {
                     printf("%s is not found in PATH\n", cmd);
                 } else {
-                    printf("resolved with PATH to: %s\n", resolved);
                     args[0] = resolved;
                     if (execv(args[0], args) == -1) {
-                        err();
+                        err("execv failed");
                     }
-                    free(resolved);
-                    free(args);
                 }
+                exit(EXIT_FAILURE);
             } else {
-                // Parent.
                 if (wait(NULL) == -1) {
-                    err();
+                    perror("wait");
+                    err("wait failed");
                 }
             }
         }
 
-        free_list(args_list);
-
-        printf("wish> ");
+        free(args);
+        printf(PROMPT);
     }
 
-    return 0;
+    return EXIT_SUCCESS;
 }
