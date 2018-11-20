@@ -99,10 +99,21 @@ int main(void)
 
             set_path(&args[1]); // skip path cmd from args[0]
 
+        } else if (strcmp(cmd, "cd") == 0) {
+
+            if (args_no == 1) {
+                if (chdir(args[1]) == -1) {
+                    perror("chdir");
+                    err("chdir failed");
+                }
+            } else {
+                err("cd expects a single argument");
+            }
         } else {
 
             pid_t rc = fork();
             if (rc < 0) {
+                perror("fork");
                 err("fork failed");
             } else if (rc == 0) {
                 char* resolved = find_in_path(cmd);
@@ -111,6 +122,7 @@ int main(void)
                 } else {
                     args[0] = resolved;
                     if (execv(args[0], args) == -1) {
+                        perror("execv");
                         err("execv failed");
                     }
                 }
