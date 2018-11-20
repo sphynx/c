@@ -55,37 +55,48 @@ static char
     return NULL;
 }
 
+static void
+parse(char *line, char ***args, size_t *args_len)
+{
+    const char *sep = " \t\n";
+
+    size_t list_len = 0;
+    struct node *list = NULL;
+    for (char *tok = strtok(line, sep); tok; tok = strtok(NULL, sep)) {
+        add_elem(&list, tok);
+        list_len++;
+    }
+
+    // Prepare arguments NULL-terminated array.
+    size_t new_args_len = list_len;
+    char **new_args = calloc(new_args_len + 1, sizeof(char *));
+    char **curr_args = new_args;
+
+    for (struct node *curr = list; curr; curr = curr->next)
+        *curr_args++ = curr->val;
+
+    new_args[new_args_len] = NULL;
+    free_list(list);
+
+    *args = new_args;
+    *args_len = new_args_len;
+}
+
 int main(void)
 {
     char *line = NULL;
     size_t cap = 0;
     ssize_t line_len;
-    const char *sep = " \t\n";
+    char **args;
     char *cmd;
+    size_t args_len;
 
     init_path();
 
     printf(PROMPT);
     while ((line_len = getline(&line, &cap, stdin)) > 0) {
-        struct node *args_list = NULL;
-        char *arg_token;
-
-        cmd = strtok(line, sep);
-        while ((arg_token = strtok(NULL, sep)) != NULL)
-            add_elem(&args_list, arg_token);
-
-        // Prepare cmd+arguments NULL-terminated array.
-        size_t args_no = length(args_list);
-        char **args = calloc(args_no + 2, sizeof(char *));
-
-        args[0] = cmd;
-        struct node *curr = args_list;
-        for (size_t i = 1; i <= args_no; i++) {
-            args[i] = curr->val;
-            curr = curr->next;
-        }
-        args[args_no + 1] = NULL;
-        free_list(args_list);
+        parse(line, &args, &args_len);
+        cmd = args[0];
 
         if (cmd == NULL) {
 
@@ -101,7 +112,7 @@ int main(void)
 
         } else if (strcmp(cmd, "cd") == 0) {
 
-            if (args_no == 1) {
+            if (args_len == 2) {
                 if (chdir(args[1]) == -1) {
                     perror("chdir");
                     err("chdir failed");
@@ -110,7 +121,6 @@ int main(void)
                 err("cd expects a single argument");
             }
         } else {
-
             pid_t rc = fork();
             if (rc < 0) {
                 perror("fork");
