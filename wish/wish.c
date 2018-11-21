@@ -4,11 +4,14 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
+#include "lexer.h"
 #include "list.h"
 
 #define PROMPT "wish> "
 
 static struct node *path;
+
+enum redir_state { NONE, EXPECTED, GIVEN };
 
 static void
 err(char *msg)
@@ -55,17 +58,51 @@ static char
     return NULL;
 }
 
-static void
-parse(char *line, char ***args, size_t *args_len)
+static int
+parse(char *line, char ***args, size_t *args_len, char** redir)
 {
-    const char *sep = " \t\n";
-
     size_t list_len = 0;
     struct node *list = NULL;
-    for (char *tok = strtok(line, sep); tok; tok = strtok(NULL, sep)) {
-        add_elem(&list, tok);
-        list_len++;
+
+    char *token = malloc(strlen(line));
+
+    enum token_type tt;
+    enum redir_state rs = NONE;
+    *redir = NULL;
+
+    while ((tt = next_token(&line, token)) != END) {
+        switch (tt) {
+        case SPACE:
+            continue;
+        case WORD:
+            switch (rs) {
+            case NONE:
+                add_elem(&list, strdup(token));
+                list_len++;
+                break;
+            case EXPECTED:
+                *redir = strdup(token);
+                rs = GIVEN;
+                break;
+            case GIVEN:
+                err("arguments can't continue after redirection");
+                return -1;
+            }
+            break;
+        case GT:
+            if (rs == NONE) {
+                rs = EXPECTED;
+            } else {
+                err("more than one redirection");
+                return -1;
+            }
+            break;
+        case END:
+            break; // should not happen
+        }
     }
+
+    free(token);
 
     // Prepare arguments NULL-terminated array.
     size_t new_args_len = list_len;
@@ -80,6 +117,8 @@ parse(char *line, char ***args, size_t *args_len)
 
     *args = new_args;
     *args_len = new_args_len;
+
+    return 0;
 }
 
 int main(void)
@@ -90,14 +129,20 @@ int main(void)
     char **args;
     char *cmd;
     size_t args_len;
+    char *redir;
 
     init_path();
 
     printf(PROMPT);
     while ((line_len = getline(&line, &cap, stdin)) > 0) {
-        parse(line, &args, &args_len);
-        cmd = args[0];
 
+        if (parse(line, &args, &args_len, &redir) == -1) {
+            // parser error, so just repeat the prompt and try again
+            printf(PROMPT);
+            continue;
+        }
+
+        cmd = args[0];
         if (cmd == NULL) {
 
             // do nothing
