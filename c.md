@@ -105,3 +105,27 @@ You can look at some of those articles and sites:
 [http://www.unixwiz.net/techtips/reading-cdecl.html](Stephen Friedl)
 [https://eli.thegreenplace.net/2008/07/18/reading-c-type-declarations](Eli Benderski)
 [https://cdecl.org/](cdecl.org)
+
+Also, reading K&R book, chapter 5.12 "Complicated declarations" helps
+a lot. They also provide an example program which transforms
+declarations to human readable string (similar to cdecl, but working
+under simplified grammar).
+
+Another interesting point is illustrated in section 5.7
+"Multi-dimensional arrays" which demonstrates that
+
+int *daytab[13]
+
+and
+
+int (*daytab)[13]
+
+are very different, since [] bind tighter than *. Therefore, the first
+one is 13-element array of pointers to int and the second one, is a
+pointer to 13-element array of int.
+
+This is directly related to "p *(int(*)[32]) x" gdb trick, showing why
+parenthesis are needed there.
+
+Having something like "p *(int*[32]) x" would mean that we ask to
+treat that x as an array of pointers, not a pointer to array.
