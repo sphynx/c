@@ -1,3 +1,4 @@
+#include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -134,13 +135,12 @@ int main(void)
     init_path();
 
     printf(PROMPT);
+
     while ((line_len = getline(&line, &cap, stdin)) > 0) {
 
-        if (parse(line, &args, &args_len, &redir) == -1) {
+        if (parse(line, &args, &args_len, &redir) == -1)
             // parser error, so just repeat the prompt and try again
-            printf(PROMPT);
-            continue;
-        }
+            goto repeat;
 
         cmd = args[0];
         if (cmd == NULL) {
@@ -176,6 +176,21 @@ int main(void)
                     printf("%s is not found in PATH\n", cmd);
                 } else {
                     args[0] = resolved;
+                    if (redir) {
+                        if (close(1) == -1) {
+                            perror("close");
+                            exit(EXIT_FAILURE);
+                        }
+
+                        int fd = open(redir, O_WRONLY | O_CREAT | O_TRUNC,
+                                      S_IRUSR | S_IWUSR);
+
+                        if (fd == -1) {
+                            perror("open");
+                            exit(EXIT_FAILURE);
+                        }
+                    }
+
                     if (execv(args[0], args) == -1) {
                         perror("execv");
                         err("execv failed");
@@ -190,6 +205,7 @@ int main(void)
             }
         }
 
+    repeat:
         free(args);
         printf(PROMPT);
     }
