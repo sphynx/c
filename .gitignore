@@ -3,6 +3,7 @@
 *.id
 *.o
 *.gch
+.DS_Store
 
 # binary files
 cat/my-cat

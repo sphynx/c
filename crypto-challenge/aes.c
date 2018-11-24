@@ -235,5 +235,5 @@ ctr_encrypt(unsigned char *in,
             uint64_t nonce,
             unsigned char *out)
 {
-    return ctr_decrypt(in, in_len, key_nonce, out);
+    return ctr_decrypt(in, in_len, key, nonce, out);
 }

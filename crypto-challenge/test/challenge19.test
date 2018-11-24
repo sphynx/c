@@ -1,0 +1,2 @@
+$ ../challenge19 | grep -q -i "i have met them at close of day"
+>= 0
