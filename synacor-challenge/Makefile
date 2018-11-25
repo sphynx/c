@@ -1,5 +1,5 @@
 CC = clang
-CFLAGS = -Wall -Werror -Wextra -std=c99 -pedantic
+CFLAGS = -g -Wall -Werror -Wextra -std=c99 -pedantic
 
 vm: vm.o
 
@@ -9,4 +9,4 @@ clean:
 	$(RM) -f *.o vm
 
 run: vm
-	./vm
+	./vm challenge.bin

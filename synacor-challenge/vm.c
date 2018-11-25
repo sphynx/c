@@ -58,11 +58,14 @@ static uint16_t get(uint16_t data)
 }
 
 
-static void run_op(void)
+static void vm_run(void)
 {
     for (;;) {
-        assert(ip < MEMORY_SIZE);
-        assert(sp < STACK_SIZE);
+        if (ip >= MEMORY_SIZE)
+            err("IP out of bounds");
+
+        if (sp >= STACK_SIZE)
+            err("stack overflow");
 
         switch (mem[ip]) {
         case 0:
@@ -132,9 +135,9 @@ static void run_op(void)
 
         case 10: {
             // mult
-            uint64_t x = (uint64_t) get(mem[ip + 2]);
-            uint64_t y = (uint64_t) get(mem[ip + 3]);
-            uint32_t m = (uint32_t) ((x * y) % 32768);
+            uint32_t x = (uint32_t) get(mem[ip + 2]);
+            uint32_t y = (uint32_t) get(mem[ip + 3]);
+            uint16_t m = (uint16_t) ((x * y) % 32768);
             set(mem[ip + 1], m);
             ip += 4;
             break;
@@ -160,8 +163,8 @@ static void run_op(void)
 
         case 14: {
             // not
-            uint32_t x = get(mem[ip + 2]);
-            uint32_t nx = ~x & 0x7FFFFFFF;
+            uint16_t x = get(mem[ip + 2]);
+            uint16_t nx = (~x) & 0x7FFF;
             set(mem[ip + 1], nx);
             ip += 3;
             break;
@@ -182,7 +185,7 @@ static void run_op(void)
         case 17:
             // call
             stack[sp++] = ip + 2;
-            ip = mem[ip + 1];
+            ip = get(mem[ip + 1]);
             break;
 
         case 18:
@@ -202,14 +205,18 @@ static void run_op(void)
         case 20: {
             // in
             int c = getchar();
-            if (c == EOF) {
-                if (ferror(stdin)) {
-                    perror("getchar");
-                    exit(EXIT_FAILURE);
-                }
-            } else {
-                set(mem[ip + 1], (uint32_t) c);
+
+            if (ferror(stdin)) {
+                perror("getchar");
+                exit(EXIT_FAILURE);
             }
+
+            if (feof(stdin)) {
+                err("no input provided");
+                exit(EXIT_FAILURE);
+            }
+
+            set(mem[ip + 1], (uint32_t) c);
             ip += 2;
             break;
         }
@@ -248,7 +255,7 @@ int main(int argc, char* argv[])
         }
     }
 
-    run_op();
+    vm_run();
 
     return 0;
 }
