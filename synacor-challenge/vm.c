@@ -142,11 +142,18 @@ static void vm_run(void)
             break;
         }
 
-        case 11:
+        case 11: {
             // mod
-            set(mem[ip + 1], get(mem[ip + 2]) % get(mem[ip + 3]));
+            uint16_t d = get(mem[ip + 3]);
+            if (d == 0) {
+                err("mod: division by zero");
+                exit(EXIT_FAILURE);
+            }
+
+            set(mem[ip + 1], get(mem[ip + 2]) % d);
             ip += 4;
             break;
+        }
 
         case 12:
             // and
