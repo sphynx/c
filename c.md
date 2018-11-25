@@ -129,3 +129,19 @@ parenthesis are needed there.
 
 Having something like "p *(int*[32]) x" would mean that we ask to
 treat that x as an array of pointers, not a pointer to array.
+
+
+## To show which macros are predefined in C compilers:
+
+gcc -x c /dev/null -dM -E
+clang -x c /dev/null -dM -E
+
+## To check for OS:
+
+Linux and Linux-derived           __linux__
+Darwin (Mac OS X and iOS)         __APPLE__
+FreeBSD                           __FreeBSD__
+Windows                           _WIN32
+Windows 64 bit                    _WIN64 (implies _WIN32)
+
+(from https://blog.kowalczyk.info/article/j/guide-to-predefined-macros-in-c-compilers-gcc-clang-msvc-etc..html )
