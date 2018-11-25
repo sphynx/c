@@ -224,6 +224,11 @@ static void vm_run(void)
             // noop
             ip += 1;
             break;
+
+        default:
+            fprintf(stderr, "error: unknown op-code %" PRIu16 "\n",
+                    mem[ip]);
+            exit(EXIT_FAILURE);
         }
     }
 }
