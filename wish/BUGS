@@ -1,0 +1,21 @@
+== free() on non-allocated memory:
+
+➜  wish git:(master) ./wish
+wish> ls
+BUGS		lexer.h		list.h		wish.c
+Makefile	lexer.o		list.o		wish.dSYM
+lexer.c		list.c		wish		wish.o
+wish> ls>>
+error: more than one redirection
+wish(34539,0x7fff98dd2380) malloc: *** error for object 0x7fc1efd00050: pointer being freed was not allocated
+*** set a breakpoint in malloc_error_break to debug
+[1]    34539 abort      ./wish
+
+
+== 'ls >' works even though I think it should fail (at least it fails in zsh and bash):
+
+➜  wish git:(master) ./wish
+wish> ls>
+BUGS		lexer.h		list.h		wish.c
+Makefile	lexer.o		list.o		wish.dSYM
+lexer.c		list.c		wish		wish.o
