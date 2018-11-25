@@ -215,7 +215,7 @@ static void vm_run(void)
                 exit(EXIT_FAILURE);
             }
 
-            set(mem[ip + 1], (uint32_t) c);
+            set(mem[ip + 1], (uint16_t) c);
             ip += 2;
             break;
         }
