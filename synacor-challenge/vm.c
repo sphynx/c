@@ -53,7 +53,7 @@ static uint16_t get(uint16_t data)
     if (is_literal(data))
         return data;
 
-    err("rhs(): invalid number");
+    err("get(): invalid number");
     exit(EXIT_FAILURE);
 }
 
