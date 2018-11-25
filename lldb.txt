@@ -109,3 +109,13 @@ List source:
   l
 
   `l` has a clever syntax based on regexp argument.
+
+To add command aliases:
+
+  Example:
+  command alias bfl breakpoint set -f %1 -l %2
+
+
+To always show some variables (on every stop):
+
+  display some_expr
