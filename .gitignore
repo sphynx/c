@@ -22,4 +22,5 @@ crypto-challenge/test-aes
 crypto-challenge/depend
 measure-system-calls/measure
 wish/wish
+synacor-challenge/vm
 !*.c
