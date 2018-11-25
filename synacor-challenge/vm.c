@@ -10,7 +10,7 @@ static uint16_t mem[MEMORY_SIZE] = {0};
 static uint16_t regs[8] = {0};
 static uint16_t stack[STACK_SIZE] = {0};
 static uint16_t ip = 0; // only lowest 15 bits can address memory
-static uint16_t sp = 0; // points to the location for the *next* val
+static uint16_t sp = 0; // points to the location for the *next* push
 
 static void err(const char* msg)
 {
@@ -27,7 +27,8 @@ static int is_register(uint16_t x)
     return x >= 32768 && x <= 32775;
 }
 
-static int reg_no(uint16_t x) {
+static int reg_no(uint16_t x)
+{
     return x - 32768;
 }
 
@@ -55,7 +56,6 @@ static uint16_t get(uint16_t data)
     err("rhs(): invalid number");
     exit(EXIT_FAILURE);
 }
-
 
 static void vm_run(void)
 {
