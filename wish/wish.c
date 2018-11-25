@@ -1,3 +1,4 @@
+#include <editline/readline.h>
 #include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -125,8 +126,6 @@ parse(char *line, char ***args, size_t *args_len, char** redir)
 int main(void)
 {
     char *line = NULL;
-    size_t cap = 0;
-    ssize_t line_len;
     char **args;
     char *cmd;
     size_t args_len;
@@ -134,9 +133,9 @@ int main(void)
 
     init_path();
 
-    printf(PROMPT);
+    while ((line = readline(PROMPT)) != NULL) {
 
-    while ((line_len = getline(&line, &cap, stdin)) > 0) {
+        add_history(line);
 
         if (parse(line, &args, &args_len, &redir) == -1)
             // parser error, so just repeat the prompt and try again
@@ -207,7 +206,7 @@ int main(void)
 
     repeat:
         free(args);
-        printf(PROMPT);
+        free(line);
     }
 
     return EXIT_SUCCESS;

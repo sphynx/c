@@ -1,4 +1,5 @@
 CFLAGS = -g -Wall -Wextra -Werror -pedantic -std=c99
+LDFLAGS = -ledit
 
 all: wish
 
