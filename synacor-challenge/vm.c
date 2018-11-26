@@ -60,11 +60,15 @@ static uint16_t get(uint16_t data)
 static void vm_run(void)
 {
     for (;;) {
-        if (ip >= MEMORY_SIZE)
+        if (ip >= MEMORY_SIZE) {
             err("IP out of bounds");
+            exit(EXIT_FAILURE);
+        }
 
-        if (sp >= STACK_SIZE)
+        if (sp >= STACK_SIZE) {
             err("stack overflow");
+            exit(EXIT_FAILURE);
+        }
 
         switch (mem[ip]) {
         case 0:
@@ -253,8 +257,7 @@ int main(int argc, char* argv[])
         exit(EXIT_FAILURE);
     }
 
-    size_t prog_len = fread(&mem, 16, MEMORY_SIZE, in);
-    if (prog_len == 0) {
+    if (fread(mem, 2, MEMORY_SIZE, in) == 0) {
         if (feof(in)) {
             err("empty program provided");
             exit(EXIT_FAILURE);
