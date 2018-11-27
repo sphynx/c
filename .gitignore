@@ -23,4 +23,5 @@ crypto-challenge/depend
 measure-system-calls/measure
 wish/wish
 synacor-challenge/vm
+synacor-challenge/disasm
 !*.c

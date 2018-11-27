@@ -6,7 +6,13 @@ all: vm disasm
 vm: vm.o
 disasm: disasm.o
 
-.PHONY: clean run
+%.s: %.bin disasm
+	./disasm $< > $@
+
+x.bin: challenge.bin
+	./patch.sh
+
+.PHONY: clean run walk
 
 clean:
 	$(RM) -f *.o vm
@@ -17,5 +23,7 @@ run: vm
 walk: vm
 	cat walkthrough - | ./vm challenge.bin
 
-dis: disasm
-	./disasm challenge.bin
+beach: vm x.bin
+	cat walkthrough2 - | ./vm x.bin
+
+
