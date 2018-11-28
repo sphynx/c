@@ -1,10 +1,7 @@
 CC = clang
-CFLAGS = -g -Wall -Werror -Wextra -std=c99 -pedantic
+CFLAGS = -g -Wall -Werror -Wextra -std=c99 -pedantic -O2
 
-all: vm disasm
-
-vm: vm.o
-disasm: disasm.o
+all: vm disasm orb
 
 %.s: %.bin disasm
 	./disasm $< > $@
@@ -26,4 +23,5 @@ walk: vm
 beach: vm x.bin
 	cat walkthrough2 - | ./vm x.bin
 
-
+run_orb: orb
+	./orb

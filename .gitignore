@@ -24,4 +24,7 @@ measure-system-calls/measure
 wish/wish
 synacor-challenge/vm
 synacor-challenge/disasm
+synacor-challenge/orb
+synacor-challenge/x.bin
+synacor-challenge/x.s
 !*.c
