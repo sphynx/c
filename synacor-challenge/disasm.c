@@ -74,7 +74,7 @@ main(int argc, char *argv[])
             break;
         }
 
-        printf("%05" PRIu16 ":  ", ip);
+        printf("L%05" PRIu16 ":  ", ip);
 
         switch (buf[ip++]) {
         case 0:

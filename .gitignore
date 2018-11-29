@@ -27,4 +27,5 @@ synacor-challenge/disasm
 synacor-challenge/orb
 synacor-challenge/x.bin
 synacor-challenge/x.s
+synacor-challenge/asm
 !*.c
