@@ -3,6 +3,9 @@ CFLAGS = -g -Wall -Werror -Wextra -std=c99 -pedantic -O2
 
 all: vm disasm orb
 
+vm: vm.o common.o
+disasm: disasm.o common.o
+
 %.s: %.bin disasm
 	./disasm $< > $@
 

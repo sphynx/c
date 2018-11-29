@@ -2,26 +2,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define MEMORY_SIZE (1ULL << 15)
+#include "common.h"
 
 static uint16_t buf[MEMORY_SIZE];
 
-static void err(const char* msg)
-{
-    fprintf(stderr, "error: %s\n", msg);
-}
-
-static int is_register(uint16_t x)
-{
-    return x >= 32768 && x <= 32775;
-}
-
-static int reg_no(uint16_t x)
-{
-    return x - 32768;
-}
-
-void data_str(const uint16_t data, char *str)
+static void
+data_str(const uint16_t data, char *str)
 {
     if (is_register(data)) {
         snprintf(str, 8, "%%%d", reg_no(data));
@@ -30,12 +16,14 @@ void data_str(const uint16_t data, char *str)
     }
 }
 
-void raw_str(const uint16_t data, char *str)
+static void
+raw_str(const uint16_t data, char *str)
 {
     snprintf(str, 8, "%" PRIu16, data);
 }
 
-void char_str(const uint16_t data, char *str)
+static void
+char_str(const uint16_t data, char *str)
 {
     if (is_register(data)) {
         snprintf(str, 8, "%%%d", reg_no(data));
@@ -48,7 +36,8 @@ void char_str(const uint16_t data, char *str)
     }
 }
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
     if (argc != 2) {
         fprintf(stderr, "usage: %s <vm_program>\n", argv[0]);
