@@ -28,7 +28,6 @@ void push(uint16_t val)
     put(val);
 }
 
-
 void pop(uint16_t reg)
 {
     uint16_t op_code = 3U;

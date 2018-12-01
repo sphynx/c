@@ -21,14 +21,17 @@ instr_list: instr EOL
     | instr_list instr EOL
     ;
 
-instr: HALT        { halt(); }
+instr:
+      HALT         { halt(); }
     | PUSH val     { push($2); }
-    | POP REG      { pop($2); }
-    | SET REG val  { set($2, $3); }
+    | POP reg      { pop($2); }
+    | SET reg val  { set($2, $3); }
 
-val:  REG
+val:  reg
     | NUM
     ;
+
+reg: REG           { $$ = 32768 + $1; }
 
 %%
 
