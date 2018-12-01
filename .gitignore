@@ -7,9 +7,12 @@
 
 # binary files
 cat/my-cat
+
 grep/my-grep
+
 zip/my-zip
 zip/my-unzip
+
 crypto-challenge/encode-base64
 crypto-challenge/decode-base64
 crypto-challenge/challenge*
@@ -20,12 +23,19 @@ crypto-challenge/break-xor
 crypto-challenge/test-padding
 crypto-challenge/test-aes
 crypto-challenge/depend
+!*.c
+
 measure-system-calls/measure
+
 wish/wish
+
 synacor-challenge/vm
 synacor-challenge/disasm
 synacor-challenge/orb
 synacor-challenge/x.bin
 synacor-challenge/x.s
 synacor-challenge/asm
-!*.c
+synacor-challenge/asm.tab.c
+synacor-challenge/asm.tab.h
+synacor-challenge/lex.yy.c
+synacor-challenge/test.bin
