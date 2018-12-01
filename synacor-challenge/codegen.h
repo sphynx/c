@@ -1,8 +1,7 @@
 #pragma once
 
 #include <inttypes.h>
+#include <stdarg.h>
 
-void halt(void);
-void set(uint16_t reg, uint16_t val);
-void push(uint16_t val);
-void pop(uint16_t reg);
+void gen_code(uint16_t op_code, int arity, ...);
+void dw(uint16_t word);

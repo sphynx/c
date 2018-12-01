@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdarg.h>
 
 #include "codegen.h"
 
@@ -7,30 +8,23 @@ static void put(uint16_t x)
     fwrite(&x, 2, 1, stdout);
 }
 
-void halt(void)
+void gen_code(uint16_t op_code, int arity, ...)
 {
-    uint16_t op_code = 0U;
+    va_list ap;
     put(op_code);
+
+    va_start(ap, arity);
+    for (int i = 0; i < arity; i++) {
+        int arg = va_arg(ap, int);
+        uint16_t operand = (uint16_t) arg;
+        put(operand);
+    }
+
+    va_end(ap);
 }
 
-void set(uint16_t reg, uint16_t val)
-{
-    uint16_t op_code = 1U;
-    put(op_code);
-    put(reg);
-    put(val);
-}
 
-void push(uint16_t val)
+void dw(uint16_t word)
 {
-    uint16_t op_code = 2U;
-    put(op_code);
-    put(val);
-}
-
-void pop(uint16_t reg)
-{
-    uint16_t op_code = 3U;
-    put(op_code);
-    put(reg);
+    put(word);
 }

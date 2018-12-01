@@ -74,7 +74,7 @@ main(int argc, char *argv[])
             break;
         }
 
-        printf("L%05" PRIu16 ":  ", ip);
+        // printf("L%05" PRIu16 ":  ", ip);
 
         switch (buf[ip++]) {
         case 0:
@@ -206,7 +206,7 @@ main(int argc, char *argv[])
 
         default:
             raw_str(buf[ip], a);
-            printf("DATA %s\n", a);
+            printf("dw %s\n", a);
             break;
 
         }
