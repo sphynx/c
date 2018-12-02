@@ -8,6 +8,8 @@
 extern int yylex(void);
 void yyerror(const char *s);
 
+static int line_no = 1;
+
 %}
 
 %define api.value.type {uint16_t}
@@ -23,8 +25,8 @@ void yyerror(const char *s);
 
 %%
 
-instr_list: instr EOL
-    | instr_list instr EOL
+instr_list: instr eol
+    | instr_list instr eol
     ;
 
 instr:
@@ -44,7 +46,7 @@ instr:
     | OR reg val val    { gen_code(13U, 3, $2, $3, $4); }
     | NOT reg val       { gen_code(14U, 2, $2, $3); }
     | RMEM reg val      { gen_code(15U, 2, $2, $3); }
-    | WMEM reg val      { gen_code(16U, 2, $2, $3); }
+    | WMEM val val      { gen_code(16U, 2, $2, $3); }
     | CALL val          { gen_code(17U, 1, $2); }
     | RET               { gen_code(18U, 0); }
     | OUT out_arg       { gen_code(19U, 1, $2); }
@@ -60,18 +62,21 @@ val:  reg
 reg: REG           { $$ = 32768 + $1; }
    ;
 
-out_arg: reg
+out_arg: val
     | CHAR
     ;
+
+eol: EOL { line_no++; }
+   ;
 
 %%
 
 void yyerror(const char *s)
 {
-    printf("error: %s\n", s);
+    fprintf(stderr, "line: %d, error: %s\n", line_no, s);
 }
 
 int main(void)
 {
-    yyparse();
+    return yyparse();
 }
