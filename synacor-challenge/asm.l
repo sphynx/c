@@ -38,6 +38,7 @@ extern YYSTYPE yylval;
 "noop"     { return NOOP; }
 "dw"       { return DW; }
 [ \t]      ;
+;[^\n]*    ;
 \n         return EOL;
 .          return yytext[0];
 %%

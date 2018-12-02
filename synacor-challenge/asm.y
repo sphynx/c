@@ -25,8 +25,12 @@ static int line_no = 1;
 
 %%
 
-instr_list: instr eol
-    | instr_list instr eol
+instr_list: opt_instr
+    | instr_list opt_instr
+    ;
+
+opt_instr: eol
+    | instr eol
     ;
 
 instr:
