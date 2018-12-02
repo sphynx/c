@@ -1,6 +1,7 @@
 #include <inttypes.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "common.h"
 
@@ -40,16 +41,21 @@ int
 main(int argc, char *argv[])
 {
     if (argc != 2) {
-        fprintf(stderr, "usage: %s <vm_program>\n", argv[0]);
+        fprintf(stderr, "usage: %s <vm_program> (use '-' for stdin)\n",
+                argv[0]);
         exit(EXIT_FAILURE);
     }
 
-    FILE *in = fopen(argv[1], "rb");
-    if (in == NULL) {
-        perror(argv[1]);
-        exit(EXIT_FAILURE);
+    FILE *in;
+    if (strcmp(argv[1], "-") == 0) {
+        in = stdin;
+    } else {
+        in = fopen(argv[1], "rb");
+        if (in == NULL) {
+            perror(argv[1]);
+            exit(EXIT_FAILURE);
+        }
     }
-
 
     size_t read_bytes = fread(buf, 2, MEMORY_SIZE, in);
     if (read_bytes == 0) {
