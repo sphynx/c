@@ -47,5 +47,8 @@ run_orb: orb
 	./orb
 
 test-asm: asm disasm
-	@./asm <test.s >test.bin
-	@./disasm test.bin
+	@./disasm challenge.bin > challenge.s
+	@./asm <challenge.s >my.challenge.bin
+	@if diff -q challenge.bin my.challenge.bin; then echo "test passed"; fi
+	@rm my.challenge.bin
+
