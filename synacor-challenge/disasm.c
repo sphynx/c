@@ -1,4 +1,5 @@
 #include <assert.h>
+#include <ctype.h>
 #include <inttypes.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -38,8 +39,10 @@ char_str(const uint16_t data, char *str)
     } else {
         if (data == 10) {
             snprintf(str, 8, "'\\n'");
-        } else {
+        } else if (isprint(data)) {
             snprintf(str, 8, "'%c'", (char) data);
+        } else {
+            snprintf(str, 8, "%" PRIu16, data);
         }
     }
 }
