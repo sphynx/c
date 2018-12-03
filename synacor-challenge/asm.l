@@ -3,17 +3,19 @@
 
 %{
 #include <inttypes.h>
+#include <string.h>
 
 #include "asm.tab.h"
+#include "table.h"
 
 extern YYSTYPE yylval;
 %}
 
 %%
-%[0-7]     { yylval = (uint16_t) atoi(yytext + 1); return REG; }
-[0-9]+     { yylval = (uint16_t) atoi(yytext); return NUM; }
-'.'        { yylval = (uint16_t) (yytext[1]); return CHAR; }
-'\\n'      { yylval = 10; return CHAR; }
+%[0-7]     { yylval.num = (uint16_t) atoi(yytext + 1); return REG; }
+[0-9]+     { yylval.num = (uint16_t) atoi(yytext); return NUM; }
+'.'        { yylval.num = (uint16_t) (yytext[1]); return CHAR; }
+'\\n'      { yylval.num = 10; return CHAR; }
 "halt"     { return HALT; }
 "set"      { return SET; }
 "push"     { return PUSH; }
@@ -39,7 +41,11 @@ extern YYSTYPE yylval;
 "dw"       { return DW; }
 [ \t]      ;
 ;[^\n]*    ;
-\n         return EOL;
-.          return yytext[0];
+\n         { return EOL; }
+.          { return yytext[0]; }
+[a-z_][a-z_0-9]* {
+  yylval.label = add_label(yytext);
+  return LABEL;
+  }
 %%
 

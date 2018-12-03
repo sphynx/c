@@ -1,23 +1,17 @@
-
-
-;test
+;; test program
 
 noop ;; test comment
-; comment again
-push 10 ;;
+second:
+start: push 10
 push 20
+jmp start
 pop %0
 pop %1
-set %2 10
+ss: set %2 10
 out %0
-out 'c'
+print: out 'c'
+jt %0 ss
 out '\n'
-halt
-
-; test
-
-; test
-
-
-
+exit:
+    halt
 

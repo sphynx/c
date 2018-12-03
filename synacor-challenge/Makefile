@@ -20,7 +20,7 @@ asm.tab.c asm.tab.h: asm.y
 
 lex.yy.o: asm.tab.h
 
-asm: -lfl lex.yy.o asm.tab.o codegen.o
+asm: -lfl lex.yy.o asm.tab.o codegen.o table.o
 	$(CC) $(CFLAGS) $(LDFLAGS) $^ -o $@
 
 %.s: %.bin disasm
@@ -46,7 +46,7 @@ beach: vm x.bin
 run_orb: orb
 	./orb
 
-test-asm: asm disasm
+test: asm disasm
 	@./disasm challenge.bin > challenge.s
 	@./asm <challenge.s >my.challenge.bin
 	@if diff -q challenge.bin my.challenge.bin; then echo "test passed"; fi
