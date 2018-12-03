@@ -56,7 +56,7 @@ instr:
     | OUT out_arg       { gen_code(19U, 1, $2); }
     | IN reg            { gen_code(20U, 1, $2); }
     | NOOP              { gen_code(21U, 0); }
-    | DW NUM            { dw($1); }
+    | DW NUM            { dw($2); }
     ;
 
 val:  reg
