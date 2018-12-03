@@ -20,6 +20,11 @@ is_register(uint16_t x)
     return x >= 32768 && x <= 32775;
 }
 
+int
+is_value(uint16_t x)
+{
+    return x <= 32775;
+}
 
 int
 reg_no(uint16_t x)

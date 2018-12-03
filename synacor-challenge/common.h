@@ -10,4 +10,6 @@ int is_register(uint16_t x);
 
 int is_literal(uint16_t x);
 
+int is_value(uint16_t x);
+
 int reg_no(uint16_t x);
