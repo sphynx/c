@@ -1,6 +1,7 @@
 ;; test program
 
 noop ;; test comment
+jmp exit
 second:
 start: push 10
 push 20
@@ -14,4 +15,4 @@ jt %0 ss
 out '\n'
 exit:
     halt
-
+push 12
