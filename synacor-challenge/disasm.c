@@ -11,6 +11,8 @@
 #define LIT(n) (is_literal(buf[ip + n]))
 #define VAL(n) (is_value(buf[ip + n]))
 
+#define COMMENT_OFFSET 25
+
 static uint16_t buf[MEMORY_SIZE];
 
 static void
@@ -111,6 +113,9 @@ main(int argc, char *argv[])
     }
 
     uint16_t ip = 0;
+    uint16_t old_ip = ip;
+    int n;
+
     char a[8];
     char b[8];
     char c[8];
@@ -121,139 +126,144 @@ main(int argc, char *argv[])
         }
 
         if (check_instruction(ip)) {
+
             switch (buf[ip++]) {
             case 0:
-                printf("halt\n");
+                n = printf("halt");
                 break;
 
             case 1:
                 val_str(buf[ip++], a);
                 val_str(buf[ip++], b);
-                printf("set %s %s\n", a, b);
+                n = printf("set %s %s", a, b);
                 break;
 
             case 2:
                 val_str(buf[ip++], a);
-                printf("push %s\n", a);
+                n = printf("push %s", a);
                 break;
 
             case 3:
                 val_str(buf[ip++], a);
-                printf("pop %s\n", a);
+                n = printf("pop %s", a);
                 break;
 
             case 4:
                 val_str(buf[ip++], a);
                 val_str(buf[ip++], b);
                 val_str(buf[ip++], c);
-                printf("eq %s %s %s\n", a, b, c);
+                n = printf("eq %s %s %s", a, b, c);
                 break;
 
             case 5:
                 val_str(buf[ip++], a);
                 val_str(buf[ip++], b);
                 val_str(buf[ip++], c);
-                printf("gt %s %s %s\n", a, b, c);
+                n = printf("gt %s %s %s", a, b, c);
                 break;
 
             case 6:
                 val_str(buf[ip++], a);
-                printf("jmp %s\n", a);
+                n = printf("jmp %s", a);
                 break;
 
             case 7:
                 val_str(buf[ip++], a);
                 val_str(buf[ip++], b);
-                printf("jt %s %s\n", a, b);
+                n = printf("jt %s %s", a, b);
                 break;
 
             case 8:
                 val_str(buf[ip++], a);
                 val_str(buf[ip++], b);
-                printf("jf %s %s\n", a, b);
+                n = printf("jf %s %s", a, b);
                 break;
 
             case 9:
                 val_str(buf[ip++], a);
                 val_str(buf[ip++], b);
                 val_str(buf[ip++], c);
-                printf("add %s %s %s\n", a, b, c);
+                n = printf("add %s %s %s", a, b, c);
                 break;
 
             case 10:
                 val_str(buf[ip++], a);
                 val_str(buf[ip++], b);
                 val_str(buf[ip++], c);
-                printf("mult %s %s %s\n", a, b, c);
+                n = printf("mult %s %s %s", a, b, c);
                 break;
 
             case 11:
                 val_str(buf[ip++], a);
                 val_str(buf[ip++], b);
                 val_str(buf[ip++], c);
-                printf("mod %s %s %s\n", a, b, c);
+                n = printf("mod %s %s %s", a, b, c);
                 break;
 
             case 12:
                 val_str(buf[ip++], a);
                 val_str(buf[ip++], b);
                 val_str(buf[ip++], c);
-                printf("and %s %s %s\n", a, b, c);
+                n = printf("and %s %s %s", a, b, c);
                 break;
 
             case 13:
                 val_str(buf[ip++], a);
                 val_str(buf[ip++], b);
                 val_str(buf[ip++], c);
-                printf("or %s %s %s\n", a, b, c);
+                n = printf("or %s %s %s", a, b, c);
                 break;
 
             case 14:
                 val_str(buf[ip++], a);
                 val_str(buf[ip++], b);
-                printf("not %s %s\n", a, b);
+                n = printf("not %s %s", a, b);
                 break;
 
             case 15:
                 val_str(buf[ip++], a);
                 val_str(buf[ip++], b);
-                printf("rmem %s %s\n", a, b);
+                n = printf("rmem %s %s", a, b);
                 break;
 
             case 16:
                 val_str(buf[ip++], a);
                 val_str(buf[ip++], b);
-                printf("wmem %s %s\n", a, b);
+                n = printf("wmem %s %s", a, b);
                 break;
 
             case 17:
                 val_str(buf[ip++], a);
-                printf("call %s\n", a);
+                n = printf("call %s", a);
                 break;
 
             case 18:
-                printf("ret\n");
+                n = printf("ret");
                 break;
 
             case 19:
                 char_str(buf[ip++], a);
-                printf("out %s\n", a);
+                n = printf("out %s", a);
                 break;
 
             case 20:
                 val_str(buf[ip++], a);
-                printf("in %s\n", a);
+                n = printf("in %s", a);
                 break;
 
             case 21:
-                printf("noop\n");
+                n = printf("noop");
                 break;
             }
 
         } else {
             raw_str(buf[ip++], a);
-            printf("dw %s\n", a);
+            n = printf("dw %s", a);
         }
+
+        printf("%*c", COMMENT_OFFSET - n, ' ');
+        printf("; %" PRIu16 "\n", old_ip);
+        old_ip = ip;
     }
 
     return 0;
