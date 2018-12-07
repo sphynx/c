@@ -2,6 +2,7 @@
 
 noop ;; test comment
 jmp exit
+jmp $
 second:
 start: push 10
 push 20

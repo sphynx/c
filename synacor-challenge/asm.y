@@ -85,9 +85,8 @@ val:  reg
 
 address:
       val
-    | LABEL {
-         if ($1->declared) { $$ = $1->address; }
-      }
+    | LABEL { if ($1->declared) { $$ = $1->address; } }
+    | '$'   { $$ = current_addr(); }
     ;
 
 reg: REG   { $$ = 32768 + $1; }
