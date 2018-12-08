@@ -37,8 +37,8 @@ clean:
 run: asm
 	@./asm
 
-walk: vm
-	cat walkthrough - | ./vm challenge.bin
+walk: vm my.challenge.bin
+	cat walkthrough - | ./vm my.challenge.bin
 
 beach: vm x.bin
 	cat walkthrough2 - | ./vm x.bin
@@ -46,8 +46,10 @@ beach: vm x.bin
 run_orb: orb
 	./orb
 
+my.challenge.bin: asm challenge.s
+	./asm challenge.s my.challenge.bin
+
 test: asm disasm
-	@./disasm challenge.bin > challenge.s
 	@./asm challenge.s my.challenge.bin
 	@if diff -q challenge.bin my.challenge.bin; then echo "test passed"; fi
 	@rm my.challenge.bin

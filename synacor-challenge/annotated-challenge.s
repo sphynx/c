@@ -2345,7 +2345,7 @@ start_check:
 05456:  push %1
 05458:  push %2
 05460:  set %0 28844
-05463:  set %1 1531             ; pointer to print_char()
+05463:  set %1 1531             ; pointer to print_xored()
 05466:  add %2 14585 6785
 05470:  call 1458               ; print string stored at 28845 encoded with xor key 21370
 05472:  pop %2
