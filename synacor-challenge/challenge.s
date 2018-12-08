@@ -2599,7 +2599,7 @@ fff:
 	push %0                  ; 5445
 	push %1                  ; 5447
 	push %2                  ; 5449
-	jt %7 5605               ; 5451
+	jf %7 5605               ; 5451
 
 start_check:
 	push %0                  ; 5454
