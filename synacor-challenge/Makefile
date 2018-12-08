@@ -39,7 +39,7 @@ walk: vm my.challenge.bin
 	@cat walkthrough | ./vm my.challenge.bin
 
 carry-orb: vm my.challenge.bin orb
-	./orb >orb-path
+	./orb >orb-path 2>/dev/null
 	cat walkthrough2 orb-path | ./vm my.challenge.bin
 
 test: asm disasm

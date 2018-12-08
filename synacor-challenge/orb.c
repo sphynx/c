@@ -1,45 +1,54 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 
 #define PLUS   -1
 #define MINUS  -2
 #define STAR   -3
 #define NONE    0
 
+/*
+ * We know that we can only approach the target square from the west
+ * (otherwise we'll get 30 before reaching the final target, which is
+ * prohibited). So we actually aim for square (3,2) and 31, to finish
+ * with 31 - 1 = 30. This makes calculating permutations much faster.
+ */
 #define TARGET_I  3
-#define TARGET_J  3
-#define TARGET   30
+#define TARGET_J  2
+#define TARGET   31
 
+// Checks to run. Undefine to disable.
 #define CHECK_START_SQUARE
 #define CHECK_PREMATURE_TARGET_ENERGY
 #define CHECK_PREMATURE_TARGET_SQUARE
 
-// Path template which is then permuted and interpreted to find
-// whether it matches the target or not.
-
-// Constraints: #E - #W = 3, #N - #S = 3, so that we end up in the
-// final cell.
-
-// I came up manually with 14-long path, but it was too long, so we
-// should be able to put the path we are looking for into 12
-// characters + '\0' terminator.
+/*
+ * Path template which is then permuted and interpreted to find
+ * whether it matches the target or not.
+ *
+ * Constraints: #E - #W = TARGET_J, #N - #S = TARGET_I, so that we end
+ * up in the target square.
+ *
+ * I came up manually with a 14 steps long path, but it was too long,
+ * so we should be able to put the path we are looking for into 12
+ * characters + '\0' terminator.
+*/
 static char path[13];
 
 // Map.
-static char m[4][4] = { {22, MINUS, 9, STAR},
+static int m[4][4] =  { {22, MINUS, 9, STAR},
                         {PLUS, 4, MINUS, 18},
                         {4, STAR, 11, STAR},
                         {STAR, 8, MINUS, 1} };
-
 
 static void step(int *op, int *val, int i, int j)
 {
     if (*op < 0) {
         switch (*op) {
+
         case PLUS:  *val += m[i][j]; break;
         case STAR:  *val *= m[i][j]; break;
         case MINUS: *val -= m[i][j]; break;
+
         default:
             printf("unexpected op\n");
             exit(EXIT_FAILURE);
@@ -98,7 +107,7 @@ static int interpret(char *path)
 
         // If it's not the last turn.
         if (*path) {
-            // We should only be in the last cell during last call.
+            // We should only be in the last cell on the last step.
             #ifdef CHECK_PREMATURE_TARGET_SQUARE
             if (i == 3 && j == 3)
                 return -1;
@@ -110,11 +119,9 @@ static int interpret(char *path)
                 return -1;
             #endif
         }
-
-        //printf("%d\n", val);
     }
 
-    if (i != 3 || j != 3)
+    if (i != TARGET_I || j != TARGET_J)
         return -1;
 
     return val;
@@ -143,12 +150,12 @@ static void pretty(char *path)
         printf("\n");
         path++;
     }
+    printf("east\n"); // to get to the actual target
 }
 
 static void permute(size_t n, char *x)
 {
     if (n == 1) {
-        //printf("%s\n", path);
         if (interpret(path) == TARGET) {
             pretty(path);
             exit(EXIT_SUCCESS);
@@ -169,11 +176,11 @@ static void try_paths(int len)
     int n, e, w, s;
     int i;
 
-    printf("Trying paths of length %d\n", len);
+    fprintf(stderr, "Trying paths of length %d\n", len);
     for (w = 0; w < len / 2; w++) {
         for (s = 0; s < len / 2; s++) {
-            e = w + 3;
-            n = s + 3;
+            n = s + TARGET_I;
+            e = w + TARGET_J;
 
             char *curr = path;
             if (n + e + w + s == len) {
@@ -181,10 +188,9 @@ static void try_paths(int len)
                 for (i = 0; i < w; i++) *curr++ = 'w';
                 for (i = 0; i < n; i++) *curr++ = 'n';
                 for (i = 0; i < s; i++) *curr++ = 's';
-
                 *curr = '\0';
 
-                printf("Permuting %s\n", path);
+                fprintf(stderr, "Permuting %s\n", path);
                 permute(len, path);
             }
         }
@@ -193,9 +199,9 @@ static void try_paths(int len)
 
 int main(void)
 {
-    try_paths(6);
-    try_paths(8);
-    try_paths(10);
-    try_paths(12);
+    try_paths(5);
+    try_paths(7);
+    try_paths(9);
+    try_paths(11);
     return 0;
 }
