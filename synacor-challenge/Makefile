@@ -24,13 +24,10 @@ lex.yy.o: asm.tab.h
 asm: -lfl lex.yy.o asm.tab.o codegen.o table.o
 	$(CC) $(CFLAGS) $(LDFLAGS) $^ -o $@
 
-%.s: %.bin disasm
-	./disasm $< > $@
+my.challenge.bin: asm my.challenge.s
+	./asm my.challenge.s my.challenge.bin
 
-x.bin: challenge.bin
-	./patch.sh
-
-.PHONY: clean run walk beach run_orb
+.PHONY: clean run walk carry-orb
 
 clean:
 	$(RM) -f *.o $(EXES) lex.yy.c asm.tab.c asm.tab.h test.bin
@@ -41,14 +38,9 @@ run: teleporter
 walk: vm my.challenge.bin
 	@cat walkthrough | ./vm my.challenge.bin
 
-beach: vm x.bin
-	cat walkthrough2 - | ./vm x.bin
-
-run_orb: orb
-	./orb
-
-my.challenge.bin: asm my.challenge.s
-	./asm my.challenge.s my.challenge.bin
+carry-orb: vm my.challenge.bin orb
+	./orb >orb-path
+	cat walkthrough2 orb-path | ./vm my.challenge.bin
 
 test: asm disasm
 	@./asm challenge.s my.challenge.bin
