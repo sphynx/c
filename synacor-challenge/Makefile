@@ -2,15 +2,16 @@ CC = clang
 YACC = /usr/local/opt/bison/bin/bison
 LEX = /usr/local/opt/flex/bin/flex
 
-CFLAGS = -g -Wall -Werror -Wextra -std=c99 -pedantic -O2
+CFLAGS = -Wall -Werror -Wextra -std=c99 -pedantic -O3
 vpath %.a /usr/local/opt/flex/lib
 
-EXES = vm asm disasm orb
+EXES = vm asm disasm orb teleporter
 
 all: $(EXES)
 
 vm: vm.o common.o
 disasm: disasm.o common.o
+teleporter: teleporter.o
 
 lex.yy.c: asm.l
 	$(LEX) asm.l
@@ -34,11 +35,11 @@ x.bin: challenge.bin
 clean:
 	$(RM) -f *.o $(EXES) lex.yy.c asm.tab.c asm.tab.h test.bin
 
-run: asm
-	@./asm
+run: teleporter
+	@./teleporter
 
 walk: vm my.challenge.bin
-	cat walkthrough - | ./vm my.challenge.bin
+	@cat walkthrough | ./vm my.challenge.bin
 
 beach: vm x.bin
 	cat walkthrough2 - | ./vm x.bin
@@ -46,8 +47,8 @@ beach: vm x.bin
 run_orb: orb
 	./orb
 
-my.challenge.bin: asm challenge.s
-	./asm challenge.s my.challenge.bin
+my.challenge.bin: asm my.challenge.s
+	./asm my.challenge.s my.challenge.bin
 
 test: asm disasm
 	@./asm challenge.s my.challenge.bin
