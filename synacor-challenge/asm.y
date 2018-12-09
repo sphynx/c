@@ -32,7 +32,7 @@ static FILE *out = NULL;
 %token <num> DW
 %token <label> LABEL
 
-%type <num> val reg out_arg address
+%type <num> val reg val_or_chr num_or_chr address
 
 %%
 
@@ -52,7 +52,7 @@ opt_label_def:
 
 instr:
       HALT              { gen_code(out,  0U, 0); }
-    | SET reg val       { gen_code(out,  1U, 2, $2, $3); }
+    | SET reg address   { gen_code(out,  1U, 2, $2, $3); }
     | PUSH val          { gen_code(out,  2U, 1, $2); }
     | POP reg           { gen_code(out,  3U, 1, $2); }
     | EQ reg val val    { gen_code(out,  4U, 3, $2, $3, $4); }
@@ -70,10 +70,10 @@ instr:
     | WMEM address val  { gen_code(out, 16U, 2, $2, $3); }
     | CALL address      { gen_code(out, 17U, 1, $2); }
     | RET               { gen_code(out, 18U, 0); }
-    | OUT out_arg       { gen_code(out, 19U, 1, $2); }
+    | OUT val_or_chr    { gen_code(out, 19U, 1, $2); }
     | IN reg            { gen_code(out, 20U, 1, $2); }
     | NOOP              { gen_code(out, 21U, 0); }
-    | DW NUM            { dw(out, $2); }
+    | DW num_or_chr     { dw(out, $2); }
     ;
 
 label_def:
@@ -92,8 +92,13 @@ address:
 reg: REG   { $$ = 32768 + $1; }
     ;
 
-out_arg:
+val_or_chr:
       val
+    | CHAR
+    ;
+
+num_or_chr:
+      NUM
     | CHAR
     ;
 
@@ -105,6 +110,7 @@ eol: EOL   { line_no++; }
 void yyerror(const char *s)
 {
     fprintf(stderr, "line: %d, error: %s\n", line_no, s);
+    exit(EXIT_FAILURE);
 }
 
 int main(int argc, char *argv[])
@@ -139,5 +145,5 @@ int main(int argc, char *argv[])
     yyrestart(yyin);
     gen_reset();
     yyparse();
-    print_labels();
+    // print_labels();
 }
