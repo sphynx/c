@@ -24,6 +24,10 @@ int main(int argc, char *argv[])
     struct timeval curr;
     long size_to_alloc = size_in_meg * 1024 * 1024;
     unsigned char *arr = malloc(size_to_alloc);
+    if (arr == NULL) {
+        printf("Not enough memory\n");
+        exit(EXIT_FAILURE);
+    }
 
     printf("allocating %ld bytes\n", size_to_alloc);
 
