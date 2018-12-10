@@ -1,7 +1,7 @@
 CC = gcc
+CFLAGS = -g -Wall -Wextra -pedantic -std=c99 -O2
 CPPFLAGS = -D_XOPEN_SOURCE=700
-CFLAGS = -Wall -Wextra -pedantic -std=c99 -O2
-EXES = memory-user null
+EXES = memory-user null not-freed
 
 all: $(EXES)
 
