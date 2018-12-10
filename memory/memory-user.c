@@ -4,6 +4,7 @@
 #include <string.h>
 #include <sys/time.h>
 #include <time.h>
+#include <unistd.h>
 
 int main(int argc, char *argv[])
 {
@@ -20,23 +21,26 @@ int main(int argc, char *argv[])
         exit(EXIT_FAILURE);
     }
 
+    pid_t pid = getpid();
+    printf("pid: %ld\n", (long) pid);
+
     struct timeval start;
     struct timeval curr;
     long size_to_alloc = size_in_meg * 1024 * 1024;
+
+    printf("allocating %ld bytes...\n", size_to_alloc);
     unsigned char *arr = malloc(size_to_alloc);
     if (arr == NULL) {
         printf("Not enough memory\n");
         exit(EXIT_FAILURE);
     }
 
-    printf("allocating %ld bytes\n", size_to_alloc);
-
     memset(arr, 0, size_to_alloc);
     gettimeofday(&start, NULL);
 
     long times = 0;
     for (;;) {
-        for (int i = 0; i < size_to_alloc; i++)
+        for (long i = 0; i < size_to_alloc; i++)
             arr[i]++;
 
         times++;

@@ -41,3 +41,8 @@ synacor-challenge/asm.tab.c
 synacor-challenge/asm.tab.h
 synacor-challenge/lex.yy.c
 synacor-challenge/test.bin
+synacor-challenge/programs/*.i
+synacor-challenge/programs/*.exe
+
+
+memory/memory-user
