@@ -1,6 +1,6 @@
 ASM = ../asm
 VM = ../vm
-CPP = cc -E -P
+CPP = cc -x assembler-with-cpp -E -P
 
 all: run
 
