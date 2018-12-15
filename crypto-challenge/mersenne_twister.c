@@ -2,70 +2,71 @@
  * Based on pseudo-code from
  * https://en.wikipedia.org/wiki/Mersenne_Twister
  *
- * MT19937 version (32-bits word).
+ * MT19937 version (32 bits word).
  *
  */
 
 #include "mersenne_twister.h"
 
 // MT algorithm constants.
-#define w 32UL
-#define n 624UL
-#define m 397UL
-#define r 31UL
-#define a 0x9908B0DFUL
-#define u 11UL
-#define d 0xFFFFFFFFUL
-#define s 7UL
-#define b 0x9D2C5680UL
-#define t 15UL
-#define c 0xEFC60000UL
-#define l 18UL
+#define W 32UL
+#define N 624UL
+#define M 397UL
+#define R 31UL
+#define A 0x9908B0DFUL
+#define U 11UL
+#define D 0xFFFFFFFFUL
+#define S 7UL
+#define B 0x9D2C5680UL
+#define T 15UL
+#define C 0xEFC60000UL
+#define L 18UL
 
 // Initialization constant.
-#define f 1812433253UL
+#define F 1812433253UL
 
 // Derived constants.
-#define lower_mask ((1UL << r) - 1)
-#define upper_mask (~lower_mask)
+#define LOWER_MASK ((1UL << R) - 1)
+#define UPPER_MASK (~LOWER_MASK)
 
 // Global state.
-static uint32_t MT[n];
-static uint32_t index = n + 1;
+static uint32_t MT[N];
+static uint32_t index = N + 1; // means "unseeded"
 
-// Generate the next `n` values.
-static void twist(void) {
-    for (uint32_t i = 0; i < n; i++) {
-        uint32_t x = (MT[i] & upper_mask) + (MT[(i + 1) % n] & lower_mask);
+// Generate the next `N` values.
+static void twist(void)
+{
+    for (uint32_t i = 0; i < N; i++) {
+        uint32_t x = (MT[i] & UPPER_MASK) + (MT[(i + 1) % N] & LOWER_MASK);
         uint32_t xA = x >> 1;
         if ((x % 2) != 0)
-            xA ^= a;
+            xA ^= A;
 
-        MT[i] = MT[(i + m) % n] ^ xA;
+        MT[i] = MT[(i + M) % N] ^ xA;
     }
     index = 0;
 }
 
 void seed(uint32_t seed)
 {
-    index = n;
+    index = N;
     MT[0] = seed;
-    for (uint32_t i = 1; i < n; i++)
-        MT[i] = f * (MT[i - 1] ^ (MT[i - 1] >> (w - 2))) + i;
+    for (uint32_t i = 1; i < N; i++)
+        MT[i] = F * (MT[i - 1] ^ (MT[i - 1] >> (W - 2))) + i;
 }
 
 uint32_t extract(void) {
-    if (index >= n) {
-        if (index > n)
-            seed(5489);
+    if (index >= N) {
+        if (index > N)
+            seed(5489); // default seed
         twist();
     }
 
     uint32_t y = MT[index++];
-    y ^= (y >> u) & d;
-    y ^= (y << s) & b;
-    y ^= (y << t) & c;
-    y ^= y >> l;
+    y ^= (y >> U) & D;
+    y ^= (y << S) & B;
+    y ^= (y << T) & C;
+    y ^= y >> L;
 
     return y;
 }
