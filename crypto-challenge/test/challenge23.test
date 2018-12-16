@@ -1,0 +1,2 @@
+$ ../challenge23 | grep -q -i "passed"
+>= 0

@@ -10,7 +10,7 @@ binaries = encode-base64 decode-base64 score-tester xor-encoder \
 	precalculate-pop-count challenge7 challenge8 challenge9 challenge10 \
 	test-padding test-aes challenge11 challenge12 challenge13 challenge14 \
 	challenge15 challenge16 challenge17 challenge18 challenge19 challenge21 \
-	challenge22
+	challenge22 challenge23
 target = $(lastword $(binaries))
 
 all: $(binaries)
@@ -36,6 +36,7 @@ challenge18: -lcrypto pkcs7-padding.o aes.o endian.o xor.o hex.o random.o base64
 challenge19: -lcrypto pkcs7-padding.o aes.o endian.o xor.o hex.o random.o base64.o score.o
 challenge21: mersenne_twister.o
 challenge22: mersenne_twister.o
+challenge23: mersenne_twister.o
 encode-base64: base64.o io.o
 decode-base64: base64.o io.o
 score-tester: hex.o score.o xor.o

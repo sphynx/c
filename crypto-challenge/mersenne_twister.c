@@ -47,6 +47,13 @@ static void twist(void)
     index = 0;
 }
 
+void set_state(uint32_t *new_state)
+{
+    index = N;
+    for (uint32_t i = 0; i < N; i++)
+        MT[i] = *new_state++;
+}
+
 void seed(uint32_t seed)
 {
     index = N;
@@ -66,7 +73,7 @@ uint32_t extract(void) {
     y ^= (y >> U) & D;
     y ^= (y << S) & B;
     y ^= (y << T) & C;
-    y ^= y >> L;
+    y ^= (y >> L);
 
     return y;
 }
