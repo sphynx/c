@@ -181,13 +181,13 @@ cbc_decrypt(unsigned char *in, int in_len,
 }
 
 int
-ctr_decrypt(unsigned char *in,
+ctr_encrypt(unsigned char *in,
             int in_len,
             unsigned char *key,
             uint64_t nonce,
             unsigned char *out)
 {
-    // Sey up AES key.
+    // Set up AES key.
     AES_KEY aes_key;
     AES_set_encrypt_key(key, 128, &aes_key);
 
@@ -229,11 +229,11 @@ ctr_decrypt(unsigned char *in,
 
 
 int
-ctr_encrypt(unsigned char *in,
+ctr_decrypt(unsigned char *in,
             int in_len,
             unsigned char *key,
             uint64_t nonce,
             unsigned char *out)
 {
-    return ctr_decrypt(in, in_len, key, nonce, out);
+    return ctr_encrypt(in, in_len, key, nonce, out);
 }
